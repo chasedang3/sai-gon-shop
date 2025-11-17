@@ -24,12 +24,29 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets",
+                "output": "assets"
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "node_modules/swiper/swiper-bundle.min.css",
+              "node_modules/aos/dist/aos.css",
+              "src/assets/css/bootstrap.min.css",
+              "src/assets/css/vendor.css",
+              "src/assets/css/style.css"
             ],
-            "scripts": []
+            "scripts": [
+              "src/assets/js/jquery-1.11.0.min.js",
+              "src/assets/js/bootstrap.bundle.min.js",
+              "node_modules/swiper/swiper-bundle.min.js",
+              "node_modules/aos/dist/aos.js",
+              "src/assets/js/script.js",
+              "src/assets/js/plugins.js"
+            ]
           },
           "configurations": {
             "production": {
