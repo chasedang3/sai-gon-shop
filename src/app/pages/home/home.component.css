@@ -1,9 +1,7 @@
 .service-bg {
     height: 400px;
-    width: 350px;
     border-radius: 10px;
     overflow: hidden;
-    background-color: #f0f0f0;
     display: flex;
     justify-content: center;
     align-items: center;
