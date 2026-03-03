@@ -1,0 +1,143 @@
+.service-bg {
+    height: 400px;
+    width: 350px;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.featured-section {
+    padding: 4rem 0;
+    background-color: #faf9f7;
+}
+
+.featured-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding: 0 1rem;
+}
+
+.featured-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.featured-subtitle {
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+    color: #6b7280;
+}
+
+.featured-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+@media (min-width: 768px) {
+    .featured-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1.5rem;
+    }
+}
+
+@media (min-width: 1200px) {
+    .featured-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 2rem;
+    }
+}
+
+.card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+}
+
+.card-image {
+    position: relative;
+    padding-top: 125%;
+    background-color: #f3f4f6;
+    overflow: hidden;
+}
+
+.card-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.card:hover .card-image img {
+    transform: scale(1.05);
+}
+
+.card-body {
+    padding: 1rem 1.1rem 1.1rem;
+}
+
+.card-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #111827;
+    margin: 0;
+    line-height: 1.5;
+    min-height: 2.8em;
+}
+
+.card-price {
+    margin-top: 0.35rem;
+    font-size: 0.98rem;
+    font-weight: 600;
+    color: #c58a4a;
+}
+
+.featured-view-more {
+    margin-top: 3rem;
+    text-align: center;
+}
+
+.featured-view-more-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.8rem 2.5rem;
+    border-radius: 999px;
+    border: 1px solid #111827;
+    color: #111827;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+    background-color: transparent;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.featured-view-more-btn:hover {
+    background-color: #111827;
+    color: #ffffff;
+}
+
+.info-section {
+    padding: 4rem 0;
+    background-color: #faf9f7;
+}
