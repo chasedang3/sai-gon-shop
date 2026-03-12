@@ -1,5 +1,5 @@
-/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@import 'assets/css/bootstrap.min.css';
-@import 'assets/css/vendor.css';
-@import 'assets/css/style.css';
+/* Keep existing theme CSS loaded globally via angular.json (bootstrap, vendor, style.css) */

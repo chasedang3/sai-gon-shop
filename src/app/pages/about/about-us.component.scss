@@ -1,0 +1,24 @@
+:host {
+  display: block;
+}
+
+.about-page {
+  width: 100%;
+  padding: 2.5rem 1rem;
+  background-color: #faf9f7;
+}
+
+.about-container {
+  max-width: 1120px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  row-gap: 2rem;
+}
+
+@media (max-width: 480px) {
+  .about-page {
+    padding-bottom: 1.5rem;
+  }
+}
+

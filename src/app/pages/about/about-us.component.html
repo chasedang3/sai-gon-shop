@@ -1,0 +1,248 @@
+<section class="about-page">
+  <div class="about-container">
+    <!-- Hero / Intro -->
+    <section
+      class="rounded-3xl bg-white/80 px-6 py-10 shadow-sm ring-1 ring-slate-200/80 backdrop-blur-sm sm:px-10 sm:py-14"
+    >
+      <div class="grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:items-center">
+        <div class="max-w-3xl space-y-5">
+          <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+            Saigon Gallery
+          </p>
+          <h1 class="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+            Về Chúng Tôi
+          </h1>
+          <p class="text-sm leading-relaxed text-slate-600 sm:text-base">
+            Chúng tôi mang nghệ thuật đến gần hơn với không gian sống của bạn – để mỗi bức tường đều có
+            thể kể một câu chuyện riêng, dịu dàng nhưng đầy cảm hứng.
+          </p>
+        </div>
+
+        <div class="hidden h-full justify-end lg:flex">
+          <div
+            class="relative inline-flex h-40 w-40 items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-amber-200 via-rose-100 to-sky-100 shadow-[0_18px_60px_rgba(15,23,42,0.18)] ring-1 ring-white/70"
+          >
+            <div class="absolute inset-0 opacity-70 mix-blend-multiply">
+              <div class="h-full w-full bg-[radial-gradient(circle_at_10%_0,#f97316_0,transparent_50%),radial-gradient(circle_at_80%_100%,#0ea5e9_0,transparent_55%)]"></div>
+            </div>
+            <span class="relative text-xs font-semibold uppercase tracking-[0.26em] text-slate-900">
+              Art<br />Living
+            </span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Our Story -->
+    <section
+      class="rounded-2xl bg-white px-6 py-7 shadow-sm ring-1 ring-slate-200 sm:px-8 sm:py-9"
+    >
+      <h2 class="text-sm font-semibold uppercase tracking-[0.22em] text-slate-500">
+        Câu Chuyện Của Chúng Tôi
+      </h2>
+
+      <div class="mt-4 space-y-4 text-sm leading-relaxed text-slate-700 sm:text-base">
+        <p>
+          Saigon Gallery được tạo ra từ niềm tin rằng nghệ thuật không chỉ thuộc về bảo tàng hay những
+          không gian xa lạ, mà nên hiện diện trong chính ngôi nhà, quán café và nơi làm việc hàng ngày
+          của chúng ta.
+        </p>
+        <p>
+          Chúng tôi bắt đầu từ những bức tranh nhỏ treo trong phòng khách, từ cảm giác ấm áp khi một
+          góc tường được thắp sáng bởi màu sắc và ánh sáng. Từ đó, hành trình sưu tầm và tuyển chọn
+          tranh trở thành cách chúng tôi kết nối với những người yêu cái đẹp và yêu sự bình yên.
+        </p>
+        <p>
+          Mỗi tác phẩm tại Saigon Gallery đều được chọn lựa kỹ lưỡng, với mong muốn không chỉ “đẹp” mà
+          còn phù hợp với nhịp sống, câu chuyện và cá tính riêng của từng không gian. Chúng tôi xem
+          nghệ thuật là một phần của đời sống, không phải một món đồ trang trí nhất thời.
+        </p>
+      </div>
+    </section>
+
+    <!-- Our Values -->
+    <section class="space-y-5">
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h2 class="text-base font-semibold tracking-tight text-slate-900 sm:text-lg">
+            Giá Trị Cốt Lõi
+          </h2>
+          <p class="text-sm text-slate-500">
+            Những điều dẫn dắt cách chúng tôi chọn tranh, trưng bày và đồng hành cùng khách hàng.
+          </p>
+        </div>
+      </div>
+
+      <div
+        class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+      >
+        <article
+          *ngFor="let value of values"
+          class="group flex h-full flex-col rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md"
+        >
+          <div class="mb-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-900/90 text-slate-50 shadow-sm">
+            <span class="text-xs font-semibold">SG</span>
+          </div>
+          <h3 class="text-sm font-semibold text-slate-900">
+            {{ value.title }}
+          </h3>
+          <p class="mt-2 text-xs leading-relaxed text-slate-600 sm:text-sm">
+            {{ value.description }}
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- What We Offer -->
+    <section
+      class="rounded-2xl bg-white px-6 py-7 shadow-sm ring-1 ring-slate-200 sm:px-8 sm:py-9"
+    >
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 class="text-base font-semibold tracking-tight text-slate-900 sm:text-lg">
+            Chúng Tôi Mang Đến
+          </h2>
+          <p class="text-sm text-slate-500">
+            Những dịch vụ xoay quanh tranh treo tường và trải nghiệm nghệ thuật trong không gian sống.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-5 grid gap-4 md:grid-cols-2">
+        <article
+          *ngFor="let item of offerings"
+          class="flex flex-col rounded-2xl bg-slate-50/90 p-4 ring-1 ring-slate-200/60"
+        >
+          <h3 class="text-sm font-semibold text-slate-900">
+            {{ item.title }}
+          </h3>
+          <p class="mt-2 text-xs leading-relaxed text-slate-600 sm:text-sm">
+            {{ item.description }}
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Visual Section -->
+    <section class="grid gap-4 lg:grid-cols-2">
+      <div
+        class="overflow-hidden rounded-2xl bg-slate-200 shadow-md ring-1 ring-slate-200"
+      >
+        <img
+          src="assets/images/phong-khach-2.jpg"
+          alt="Không gian trưng bày tranh"
+          class="h-full w-full object-cover transition-transform duration-500 ease-out hover:scale-[1.03]"
+        />
+      </div>
+      <div
+        class="overflow-hidden rounded-2xl bg-slate-200 shadow-md ring-1 ring-slate-200"
+      >
+        <img
+          src="assets/images/trang-tri-2.jpg"
+          alt="Chi tiết tranh và chất liệu"
+          class="h-full w-full object-cover transition-transform duration-500 ease-out hover:scale-[1.03]"
+        />
+      </div>
+    </section>
+
+    <!-- Contact Info -->
+    <section
+      class="rounded-2xl bg-white px-6 py-7 shadow-sm ring-1 ring-slate-200 sm:px-8 sm:py-9"
+    >
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h2 class="text-base font-semibold tracking-tight text-slate-900 sm:text-lg">
+            Thông tin liên hệ
+          </h2>
+          <p class="text-sm text-slate-500">
+            Nội dung mẫu (mock) — bạn có thể cập nhật sau.
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-5 grid gap-4 md:grid-cols-2">
+        <div class="rounded-2xl bg-slate-50/90 p-4 ring-1 ring-slate-200/60">
+          <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+            Showroom
+          </p>
+          <p class="mt-2 text-sm font-medium text-slate-900">
+            Sài Gòn Gallery
+          </p>
+          <p class="mt-1 text-sm leading-relaxed text-slate-600">
+            11A Trần Phú, Quận 5, TP. Hồ Chí Minh
+          </p>
+        </div>
+
+        <div class="rounded-2xl bg-slate-50/90 p-4 ring-1 ring-slate-200/60">
+          <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+            Hotline / Zalo
+          </p>
+          <p class="mt-2 text-sm font-medium text-slate-900">
+            0934 151 103
+          </p>
+          <p class="mt-1 text-sm leading-relaxed text-slate-600">
+            Hỗ trợ nhanh tư vấn chọn tranh theo không gian.
+          </p>
+        </div>
+
+        <div class="rounded-2xl bg-slate-50/90 p-4 ring-1 ring-slate-200/60">
+          <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+            Email
+          </p>
+          <p class="mt-2 text-sm font-medium text-slate-900">
+            contact&#64;saigongallery.vn
+          </p>
+          <p class="mt-1 text-sm leading-relaxed text-slate-600">
+            Gửi yêu cầu báo giá, đặt tranh hoặc hợp tác.
+          </p>
+        </div>
+
+        <div class="rounded-2xl bg-slate-50/90 p-4 ring-1 ring-slate-200/60">
+          <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+            Giờ làm việc
+          </p>
+          <p class="mt-2 text-sm font-medium text-slate-900">
+            09:00 – 21:00 (T2 – CN)
+          </p>
+          <p class="mt-1 text-sm leading-relaxed text-slate-600">
+            Có thể hẹn lịch xem tranh theo yêu cầu.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section
+      class="rounded-2xl bg-slate-900 px-6 py-8 text-slate-50 shadow-md ring-1 ring-slate-900 sm:px-8 sm:py-9"
+    >
+      <div
+        class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div class="space-y-1">
+          <h2 class="text-base font-semibold tracking-tight sm:text-lg">
+            Hãy để chúng tôi giúp bạn tìm bức tranh phù hợp nhất.
+          </h2>
+          <p class="text-sm text-slate-300">
+            Kể cho chúng tôi nghe về không gian, phong cách và cảm xúc bạn muốn mang vào căn phòng.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+          <a
+            routerLink="/products"
+            class="inline-flex items-center rounded-full bg-white px-5 py-2.5 text-sm font-medium text-slate-900 shadow-sm transition hover:bg-slate-100"
+          >
+            Khám phá bộ sưu tập
+          </a>
+          <a
+            routerLink="/contact"
+            class="inline-flex items-center rounded-full border border-slate-500/60 px-5 py-2.5 text-sm font-medium text-slate-50 transition hover:bg-slate-800"
+          >
+            Liên hệ tư vấn
+          </a>
+        </div>
+      </div>
+    </section>
+  </div>
+</section>
+
