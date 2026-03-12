@@ -119,6 +119,12 @@
   }
 }
 
+.card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
 .card {
   background-color: #ffffff;
   border-radius: 12px;

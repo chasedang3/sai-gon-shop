@@ -1,5 +1,6 @@
 import { CommonModule, CurrencyPipe, NgOptimizedImage } from '@angular/common';
 import { Component, computed, effect, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 export interface Product {
   id: string;
@@ -12,7 +13,7 @@ export interface Product {
 @Component({
   standalone: true,
   selector: 'app-product-list',
-  imports: [CommonModule, NgOptimizedImage, CurrencyPipe],
+  imports: [CommonModule, NgOptimizedImage, CurrencyPipe, RouterLink],
   templateUrl: './product-list.component.html',
   styleUrl: './product-list.component.css',
 })

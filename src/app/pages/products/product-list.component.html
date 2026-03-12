@@ -38,27 +38,30 @@
   </div>
 
   <div class="featured-grid">
-    <div
-      class="card"
+    <a
       *ngFor="let product of paginatedProducts(); trackBy: trackByProductId"
+      class="card-link"
+      [routerLink]="['/products', product.id]"
     >
-      <div class="card-image">
-        <img
-          [ngSrc]="product.imageUrl"
-          alt="{{ product.name }}"
-          width="400"
-          height="500"
-        />
+      <div class="card">
+        <div class="card-image">
+          <img
+            [ngSrc]="product.imageUrl"
+            alt="{{ product.name }}"
+            width="400"
+            height="500"
+          />
+        </div>
+        <div class="card-body">
+          <h3 class="card-title">
+            {{ product.name }}
+          </h3>
+          <p class="card-price">
+            {{ product.price | currency : 'VND' : 'symbol' : '1.0-0' }}
+          </p>
+        </div>
       </div>
-      <div class="card-body">
-        <h3 class="card-title">
-          {{ product.name }}
-        </h3>
-        <p class="card-price">
-          {{ product.price | currency : 'VND' : 'symbol' : '1.0-0' }}
-        </p>
-      </div>
-    </div>
+    </a>
   </div>
 
   <div
