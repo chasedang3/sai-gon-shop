@@ -1,0 +1,117 @@
+<section class="featured-section product-list-section">
+  <div class="featured-header">
+    <h2 class="featured-title">
+      Danh Sách Sản Phẩm
+    </h2>
+    <p class="featured-subtitle">
+      Quản lý bộ sưu tập tranh và sản phẩm decor
+    </p>
+
+    <div class="filter-bar mt-3">
+      <div class="filter-select md:hidden">
+        <select
+          class="filter-select-control"
+          (change)="setCategory(($any($event.target)).value)"
+          [value]="selectedCategory()"
+        >
+          <option
+            *ngFor="let category of categories"
+            [value]="category"
+          >
+            {{ category }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-buttons hidden md:flex">
+        <button
+          *ngFor="let category of categories"
+          type="button"
+          (click)="setCategory(category)"
+          class="filter-button"
+          [class.filter-button--active]="selectedCategory() === category"
+        >
+          {{ category }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="featured-grid">
+    <div
+      class="card"
+      *ngFor="let product of paginatedProducts(); trackBy: trackByProductId"
+    >
+      <div class="card-image">
+        <img
+          [ngSrc]="product.imageUrl"
+          alt="{{ product.name }}"
+          width="400"
+          height="500"
+        />
+      </div>
+      <div class="card-body">
+        <h3 class="card-title">
+          {{ product.name }}
+        </h3>
+        <p class="card-price">
+          {{ product.price | currency : 'VND' : 'symbol' : '1.0-0' }}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div
+    *ngIf="totalItems() > pageSize"
+    class="pagination"
+  >
+    <div class="pagination-info">
+      <span>Hiển thị</span>
+      <span class="font-medium">
+        {{ (currentPage() - 1) * pageSize + 1 }}
+      </span>
+      <span>-</span>
+      <span class="font-medium">
+        {{ Math.min(currentPage() * pageSize, totalItems()) }}
+      </span>
+      <span>trên</span>
+      <span class="font-medium">
+        {{ totalItems() }}
+      </span>
+      <span>sản phẩm</span>
+    </div>
+
+    <div class="pagination-controls">
+      <button
+        type="button"
+        class="pagination-button"
+        [class.pagination-button--disabled]="currentPage() === 1"
+        (click)="previousPage()"
+        [disabled]="currentPage() === 1"
+      >
+        Trước
+      </button>
+
+      <button
+        *ngFor="let page of totalPagesArray(); trackBy: trackByPage"
+        type="button"
+        class="pagination-page"
+        [class.pagination-page--active]="currentPage() === page"
+        (click)="goToPage(page)"
+      >
+        {{ page }}
+      </button>
+
+      <button
+        type="button"
+        class="pagination-button"
+        [class.pagination-button--disabled]="currentPage() === totalPages()"
+        (click)="nextPage()"
+        [disabled]="currentPage() === totalPages()"
+      >
+        Sau
+      </button>
+    </div>
+  </div>
+</section>
+
