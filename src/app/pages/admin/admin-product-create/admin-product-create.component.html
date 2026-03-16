@@ -1,0 +1,255 @@
+<main class="admin-page">
+  <div class="admin-page__bg"></div>
+
+  <section class="relative w-full px-4 py-8 sm:py-12">
+    <div class="mx-auto w-full max-w-5xl">
+      <div class="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 class="text-xl font-semibold tracking-tight text-slate-900">Tạo sản phẩm</h1>
+          <p class="mt-1 text-sm text-slate-600">Thêm một tác phẩm mới vào hệ thống quản trị.</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <a
+            class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-slate-900/10"
+            [routerLink]="['/admin/login']"
+          >
+            Admin
+          </a>
+          <a
+            class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-slate-900/10"
+            [routerLink]="['/']"
+          >
+            Trang chủ
+          </a>
+        </div>
+      </div>
+
+      <div class="rounded-2xl bg-white/90 backdrop-blur shadow-[0_20px_60px_rgba(15,23,42,0.10)] ring-1 ring-slate-900/5">
+        <div class="p-6 sm:p-8">
+          <div *ngIf="errorMessage() as msg" class="mb-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            {{ msg }}
+          </div>
+
+          <div *ngIf="state() === 'success'" class="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+            Tạo sản phẩm thành công (mock).
+          </div>
+
+          <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+              <!-- Left column: Basic info + Categories -->
+              <div class="lg:col-span-7 space-y-6">
+                <section class="admin-section">
+                  <header class="admin-section__header">
+                    <h2 class="admin-section__title">Thông tin cơ bản</h2>
+                    <p class="admin-section__subtitle">Nhập các thông tin chính của tác phẩm.</p>
+                  </header>
+
+                  <div class="mt-4 grid grid-cols-1 gap-4">
+                    <div>
+                      <label for="title" class="admin-label">Tiêu đề</label>
+                      <input
+                        id="title"
+                        type="text"
+                        formControlName="title"
+                        class="admin-input"
+                        [class.admin-input--invalid]="titleCtrl.touched && titleCtrl.invalid"
+                        placeholder="Ví dụ: Tranh Canvas Hoàng Hôn"
+                      />
+                      <p *ngIf="titleCtrl.touched && titleCtrl.hasError('required')" class="admin-error">
+                        Vui lòng nhập tiêu đề.
+                      </p>
+                    </div>
+
+                    <div>
+                      <label for="description" class="admin-label">Mô tả</label>
+                      <textarea
+                        id="description"
+                        rows="5"
+                        formControlName="description"
+                        class="admin-textarea"
+                        [class.admin-input--invalid]="descriptionCtrl.touched && descriptionCtrl.invalid"
+                        placeholder="Mô tả ngắn về chất liệu, kích thước, phong cách..."
+                      ></textarea>
+                      <p *ngIf="descriptionCtrl.touched && descriptionCtrl.hasError('required')" class="admin-error">
+                        Vui lòng nhập mô tả.
+                      </p>
+                    </div>
+
+                    <div>
+                      <label for="price" class="admin-label">Giá (VND)</label>
+                      <input
+                        id="price"
+                        type="number"
+                        min="1"
+                        step="1000"
+                        formControlName="price"
+                        class="admin-input"
+                        [class.admin-input--invalid]="priceCtrl.touched && priceCtrl.invalid"
+                        placeholder="Ví dụ: 2500000"
+                      />
+                      <p *ngIf="priceCtrl.touched && priceCtrl.hasError('required')" class="admin-error">
+                        Vui lòng nhập giá.
+                      </p>
+                      <p *ngIf="priceCtrl.touched && priceCtrl.hasError('min')" class="admin-error">
+                        Giá phải lớn hơn 0.
+                      </p>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="admin-section">
+                  <header class="admin-section__header">
+                    <h2 class="admin-section__title">Danh mục</h2>
+                    <p class="admin-section__subtitle">Chọn ít nhất 1 danh mục.</p>
+                  </header>
+
+                  <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <label
+                      *ngFor="let c of categories(); trackBy: trackByCategoryId"
+                      class="flex items-start gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm"
+                    >
+                      <input
+                        type="checkbox"
+                        class="mt-0.5 h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900/20"
+                        [checked]="isCategorySelected(c.id)"
+                        (change)="toggleCategory(c.id)"
+                      />
+                      <div class="leading-5">
+                        <div class="font-semibold">{{ c.name }}</div>
+                        <div class="text-xs text-slate-500">{{ c.id }}</div>
+                      </div>
+                    </label>
+                  </div>
+
+                  <p *ngIf="categoryIdsCtrl.touched && categoryIdsCtrl.hasError('minSelected')" class="admin-error mt-3">
+                    Vui lòng chọn ít nhất 1 danh mục.
+                  </p>
+                </section>
+              </div>
+
+              <!-- Right column: Image + Type + Availability + Actions -->
+              <div class="lg:col-span-5 space-y-6">
+                <section class="admin-section">
+                  <header class="admin-section__header">
+                    <h2 class="admin-section__title">Hình ảnh</h2>
+                    <p class="admin-section__subtitle">Dán URL ảnh để xem preview.</p>
+                  </header>
+
+                  <div class="mt-4">
+                    <label for="imageUrl" class="admin-label">Image URL</label>
+                    <input
+                      id="imageUrl"
+                      type="text"
+                      formControlName="imageUrl"
+                      class="admin-input"
+                      [class.admin-input--invalid]="imageUrlCtrl.touched && imageUrlCtrl.invalid"
+                      placeholder="https://..."
+                    />
+                    <p *ngIf="imageUrlCtrl.touched && imageUrlCtrl.hasError('required')" class="admin-error">
+                      Vui lòng nhập Image URL.
+                    </p>
+                  </div>
+
+                  <div class="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
+                    <div class="aspect-[4/3] w-full bg-slate-100">
+                      <img
+                        *ngIf="imagePreviewUrl() as preview; else placeholder"
+                        [src]="preview"
+                        alt="Preview"
+                        class="h-full w-full object-cover"
+                      />
+                      <ng-template #placeholder>
+                        <div class="flex h-full w-full items-center justify-center text-sm text-slate-500">
+                          Preview ảnh sẽ hiển thị ở đây
+                        </div>
+                      </ng-template>
+                    </div>
+                    <div class="px-4 py-3 text-xs text-slate-500">
+                      Mẹo: dùng ảnh có tỷ lệ gần 4:3 để preview đẹp hơn.
+                    </div>
+                  </div>
+                </section>
+
+                <section class="admin-section">
+                  <header class="admin-section__header">
+                    <h2 class="admin-section__title">Thiết lập</h2>
+                    <p class="admin-section__subtitle">Loại sản phẩm và trạng thái bán.</p>
+                  </header>
+
+                  <div class="mt-4 grid grid-cols-1 gap-4">
+                    <div>
+                      <label for="type" class="admin-label">Loại sản phẩm</label>
+                      <select
+                        id="type"
+                        formControlName="type"
+                        class="admin-select"
+                        [class.admin-input--invalid]="typeCtrl.touched && typeCtrl.invalid"
+                      >
+                        <option value="canvas">Canvas</option>
+                        <option value="poster">Poster</option>
+                        <option value="frame">Frame</option>
+                      </select>
+                      <p *ngIf="typeCtrl.touched && typeCtrl.hasError('required')" class="admin-error">
+                        Vui lòng chọn loại sản phẩm.
+                      </p>
+                    </div>
+
+                    <label class="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+                      <div>
+                        <div class="text-sm font-semibold text-slate-900">Sản phẩm đang bán</div>
+                        <div class="text-xs text-slate-500">Bật để hiển thị và cho phép bán.</div>
+                      </div>
+                      <input
+                        type="checkbox"
+                        class="h-5 w-5 rounded border-slate-300 text-slate-900 focus:ring-slate-900/20"
+                        formControlName="isAvailable"
+                      />
+                    </label>
+                  </div>
+                </section>
+
+                <section class="admin-section">
+                  <header class="admin-section__header">
+                    <h2 class="admin-section__title">Hành động</h2>
+                    <p class="admin-section__subtitle">Kiểm tra lại trước khi tạo.</p>
+                  </header>
+
+                  <div class="mt-4 flex flex-col gap-3">
+                    <button
+                      type="submit"
+                      class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-sm transition
+                        hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-900/20 disabled:cursor-not-allowed disabled:opacity-60"
+                      [disabled]="!canSubmit()"
+                    >
+                      <span *ngIf="state() !== 'loading'">Tạo sản phẩm</span>
+                      <span *ngIf="state() === 'loading'" class="inline-flex items-center gap-2">
+                        <span class="admin-page__spinner" aria-hidden="true"></span>
+                        Đang xử lý...
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      class="inline-flex w-full items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition
+                        hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-slate-900/10"
+                      (click)="cancel()"
+                      [disabled]="state() === 'loading'"
+                    >
+                      Huỷ
+                    </button>
+                  </div>
+
+                  <div class="mt-4 text-xs text-slate-500">
+                    Payload sẽ được log ra console (mock) để chuẩn bị tích hợp REST API <span class="font-mono">POST /products</span>.
+                  </div>
+                </section>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+

@@ -1,0 +1,251 @@
+<main class="admin-page">
+  <div class="admin-page__bg"></div>
+
+  <section class="relative w-full px-4 py-8 sm:py-12">
+    <div class="mx-auto w-full max-w-6xl">
+      <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 class="text-xl font-semibold tracking-tight text-slate-900">Danh sách sản phẩm</h1>
+          <p class="mt-1 text-sm text-slate-600">Quản lý toàn bộ sản phẩm trong hệ thống.</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition
+              hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-900/20"
+            (click)="goToCreate()"
+          >
+            Tạo sản phẩm mới
+          </button>
+        </div>
+      </div>
+
+      <div class="rounded-2xl bg-white/90 backdrop-blur shadow-[0_20px_60px_rgba(15,23,42,0.10)] ring-1 ring-slate-900/5">
+        <div class="p-4 sm:p-6">
+          <div *ngIf="errorMessage() as msg" class="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            {{ msg }}
+          </div>
+
+          <div *ngIf="total() === 0" class="rounded-2xl border border-slate-200 bg-white p-8 text-center">
+            <div class="text-sm font-semibold text-slate-900">Chưa có sản phẩm</div>
+            <div class="mt-1 text-sm text-slate-600">Bấm “Tạo sản phẩm mới” để thêm tác phẩm đầu tiên.</div>
+          </div>
+
+          <div *ngIf="total() > 0" class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+            <div class="overflow-x-auto">
+              <table class="min-w-full text-left text-sm">
+                <thead class="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                  <tr>
+                    <th class="px-4 py-3">Ảnh</th>
+                    <th class="px-4 py-3">Tiêu đề</th>
+                    <th class="px-4 py-3">Giá</th>
+                    <th class="px-4 py-3">Loại</th>
+                    <th class="px-4 py-3">Đang bán</th>
+                    <th class="px-4 py-3">Danh mục</th>
+                    <th class="px-4 py-3 text-right">Hành động</th>
+                  </tr>
+                </thead>
+
+                <tbody class="divide-y divide-slate-200">
+                  <tr
+                    *ngFor="let p of pagedProducts(); trackBy: trackByProductId"
+                    class="admin-row hover:bg-slate-50/70"
+                  >
+                    <td class="px-4 py-3">
+                      <div class="h-12 w-12 overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
+                        <img [src]="p.imageUrl" [alt]="p.title" class="h-full w-full object-cover" />
+                      </div>
+                    </td>
+
+                    <td class="px-4 py-3">
+                      <div class="font-semibold text-slate-900">{{ p.title }}</div>
+                      <div class="mt-0.5 text-xs text-slate-500 font-mono">{{ p.id }}</div>
+                    </td>
+
+                    <td class="px-4 py-3 font-semibold text-slate-900">
+                      {{ formatVnd(p.price) }}
+                    </td>
+
+                    <td class="px-4 py-3">
+                      <span class="inline-flex items-center rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700">
+                        {{ p.type }}
+                      </span>
+                    </td>
+
+                    <td class="px-4 py-3">
+                      <span
+                        class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold"
+                        [class.bg-emerald-50]="p.isAvailable"
+                        [class.text-emerald-800]="p.isAvailable"
+                        [class.border]="true"
+                        [class.border-emerald-200]="p.isAvailable"
+                        [class.bg-rose-50]="!p.isAvailable"
+                        [class.text-rose-800]="!p.isAvailable"
+                        [class.border-rose-200]="!p.isAvailable"
+                      >
+                        {{ p.isAvailable ? 'Yes' : 'No' }}
+                      </span>
+                    </td>
+
+                    <td class="px-4 py-3">
+                      <div class="flex flex-wrap gap-1.5">
+                        <span
+                          *ngFor="let name of categoryLabels(p.categoryIds); trackBy: trackByString"
+                          class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700"
+                        >
+                          {{ name }}
+                        </span>
+                      </div>
+                    </td>
+
+                    <td class="px-4 py-3">
+                      <div class="flex items-center justify-end gap-2">
+                        <button
+                          type="button"
+                          class="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition
+                            hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-slate-900/10"
+                          (click)="goToEdit(p)"
+                        >
+                          ✏️ Sửa
+                        </button>
+
+                        <button
+                          type="button"
+                          class="inline-flex items-center justify-center rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700 shadow-sm transition
+                            hover:bg-rose-100 focus:outline-none focus:ring-4 focus:ring-rose-500/10 disabled:cursor-not-allowed disabled:opacity-60"
+                          (click)="openDeleteModal(p)"
+                          [disabled]="deletingId() === p.id"
+                        >
+                          <span *ngIf="deletingId() !== p.id">🗑️ Xoá</span>
+                          <span *ngIf="deletingId() === p.id" class="inline-flex items-center gap-2">
+                            <span class="admin-page__spinner admin-page__spinner--danger" aria-hidden="true"></span>
+                            Đang xoá...
+                          </span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex flex-col gap-3 border-t border-slate-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+              <div class="text-sm text-slate-600">
+                Hiển thị
+                <span class="font-semibold text-slate-900">{{ rangeStart() }}</span>
+                –
+                <span class="font-semibold text-slate-900">
+                  {{ rangeEnd() }}
+                </span>
+                / <span class="font-semibold text-slate-900">{{ total() }}</span>
+              </div>
+
+              <div class="flex items-center justify-between gap-2 sm:justify-end">
+                <button
+                  type="button"
+                  class="admin-page__pagebtn"
+                  (click)="prevPage()"
+                  [disabled]="page() === 1"
+                >
+                  Previous
+                </button>
+
+                <div class="flex items-center gap-1">
+                  <button
+                    *ngFor="let p of pages(); trackBy: trackByNumber"
+                    type="button"
+                    class="admin-page__pagenum"
+                    [class.admin-page__pagenum--active]="p === page()"
+                    (click)="setPage(p)"
+                  >
+                    {{ p }}
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  class="admin-page__pagebtn"
+                  (click)="nextPage()"
+                  [disabled]="page() === totalPages()"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Delete confirmation modal -->
+  <div *ngIf="deleteModalOpen()" class="fixed inset-0 z-50">
+    <div class="absolute inset-0 bg-slate-900/50"></div>
+
+    <div class="relative mx-auto flex min-h-full max-w-xl items-center justify-center px-4 py-10">
+      <div class="w-full rounded-2xl bg-white shadow-[0_30px_90px_rgba(15,23,42,0.25)] ring-1 ring-slate-900/10">
+        <div class="p-6 sm:p-7">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <h2 class="text-base font-semibold text-slate-900">Xác nhận xoá</h2>
+              <p class="mt-1 text-sm text-slate-600">
+                Bạn có chắc chắn muốn xoá sản phẩm này không? Hành động này không thể hoàn tác.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-4 focus:ring-slate-900/10"
+              (click)="closeDeleteModal()"
+              [disabled]="!!deletingId()"
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div *ngIf="selectedToDelete() as p" class="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <div class="flex items-center gap-3">
+              <div class="h-12 w-12 overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
+                <img [src]="p.imageUrl" [alt]="p.title" class="h-full w-full object-cover" />
+              </div>
+              <div class="min-w-0">
+                <div class="truncate text-sm font-semibold text-slate-900">{{ p.title }}</div>
+                <div class="mt-0.5 text-xs text-slate-500 font-mono">{{ p.id }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <button
+              type="button"
+              class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition
+                hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-slate-900/10 disabled:cursor-not-allowed disabled:opacity-60"
+              (click)="closeDeleteModal()"
+              [disabled]="!!deletingId()"
+            >
+              Huỷ
+            </button>
+
+            <button
+              type="button"
+              class="inline-flex items-center justify-center rounded-xl bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition
+                hover:bg-rose-500 focus:outline-none focus:ring-4 focus:ring-rose-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+              (click)="confirmDelete()"
+              [disabled]="!!deletingId()"
+            >
+              <span *ngIf="!deletingId()">Xoá sản phẩm</span>
+              <span *ngIf="deletingId()" class="inline-flex items-center gap-2">
+                <span class="admin-page__spinner admin-page__spinner--danger" aria-hidden="true"></span>
+                Đang xoá...
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+

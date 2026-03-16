@@ -1,0 +1,158 @@
+import { NgFor, NgIf } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { delay, finalize, of, throwError } from 'rxjs';
+
+type ProductType = 'canvas' | 'poster' | 'frame';
+
+type ProductCreateModel = {
+  title: string;
+  description: string;
+  price: number;
+  imageUrl: string;
+  type: ProductType;
+  isAvailable: boolean;
+  categoryIds: string[];
+};
+
+type Category = { id: string; name: string };
+type SubmitState = 'idle' | 'loading' | 'success' | 'error';
+
+function hasAtLeastOneCategory(value: unknown): boolean {
+  return Array.isArray(value) && value.length > 0;
+}
+
+@Component({
+  selector: 'app-admin-product-create',
+  standalone: true,
+  imports: [NgIf, NgFor, ReactiveFormsModule, RouterLink],
+  templateUrl: './admin-product-create.component.html',
+  styleUrl: './admin-product-create.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class AdminProductCreateComponent {
+  private readonly fb = inject(FormBuilder);
+  private readonly router = inject(Router);
+
+  readonly state = signal<SubmitState>('idle');
+  readonly errorMessage = signal<string | null>(null);
+
+  readonly categories = signal<Category[]>([
+    { id: '7f2e0e67-7d1f-4d94-8a2c-97f18fd2f8d1', name: 'Phong cảnh' },
+    { id: 'b5d92c20-cc92-4fd2-8c89-f4d2e0c1d933', name: 'Trừu tượng' }
+  ]);
+
+  readonly form = this.fb.nonNullable.group({
+    title: ['', [Validators.required]],
+    description: ['', [Validators.required]],
+    price: this.fb.nonNullable.control(0, [Validators.required, Validators.min(1)]),
+    imageUrl: ['', [Validators.required]],
+    type: this.fb.nonNullable.control<ProductType>('canvas', [Validators.required]),
+    isAvailable: this.fb.nonNullable.control(true),
+    categoryIds: this.fb.nonNullable.control<string[]>([], [
+      control => (hasAtLeastOneCategory(control.value) ? null : { minSelected: true })
+    ])
+  });
+
+  readonly imagePreviewUrl = computed(() => {
+    const url = (this.form.controls.imageUrl.value ?? '').trim();
+    return url.length > 0 ? url : null;
+  });
+
+  readonly canSubmit = computed(() => this.form.valid && this.state() !== 'loading');
+
+  markAllTouched(): void {
+    this.form.markAllAsTouched();
+    this.form.updateValueAndValidity({ onlySelf: false, emitEvent: false });
+  }
+
+  isCategorySelected(id: string): boolean {
+    return this.form.controls.categoryIds.value.includes(id);
+  }
+
+  trackByCategoryId(_index: number, item: Category): string {
+    return item.id;
+  }
+
+  toggleCategory(id: string): void {
+    const current = this.form.controls.categoryIds.value;
+    const next = current.includes(id) ? current.filter(x => x !== id) : [...current, id];
+    this.form.controls.categoryIds.setValue(next);
+    this.form.controls.categoryIds.markAsTouched();
+    this.form.controls.categoryIds.updateValueAndValidity({ emitEvent: false });
+  }
+
+  cancel(): void {
+    void this.router.navigateByUrl('/');
+  }
+
+  private mockCreateProduct(payload: ProductCreateModel) {
+    // Placeholder for future POST /products
+    const ok = payload.title.trim().length > 0;
+    return ok ? of({ id: crypto.randomUUID() }).pipe(delay(700)) : throwError(() => new Error('Dữ liệu không hợp lệ.')).pipe(delay(700));
+  }
+
+  submit(): void {
+    this.errorMessage.set(null);
+
+    if (this.form.invalid) {
+      this.markAllTouched();
+      return;
+    }
+
+    this.state.set('loading');
+
+    const payload: ProductCreateModel = this.form.getRawValue();
+
+    // Mock submit handler requirement
+    // eslint-disable-next-line no-console
+    console.log('[AdminProductCreate] payload', payload);
+
+    this.mockCreateProduct(payload)
+      .pipe(
+        finalize(() => {
+          if (this.state() === 'loading') this.state.set('idle');
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.state.set('success');
+          // Reset form for quick consecutive creation
+          this.form.reset({
+            title: '',
+            description: '',
+            price: 0,
+            imageUrl: '',
+            type: 'canvas',
+            isAvailable: true,
+            categoryIds: []
+          });
+        },
+        error: (err: unknown) => {
+          this.state.set('error');
+          this.errorMessage.set(err instanceof Error ? err.message : 'Tạo sản phẩm thất bại. Vui lòng thử lại.');
+        }
+      });
+  }
+
+  get titleCtrl() {
+    return this.form.controls.title;
+  }
+  get descriptionCtrl() {
+    return this.form.controls.description;
+  }
+  get priceCtrl() {
+    return this.form.controls.price;
+  }
+  get imageUrlCtrl() {
+    return this.form.controls.imageUrl;
+  }
+  get typeCtrl() {
+    return this.form.controls.type;
+  }
+  get categoryIdsCtrl() {
+    return this.form.controls.categoryIds;
+  }
+}
+
