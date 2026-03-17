@@ -1,17 +1,9 @@
 import { NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { delay, finalize, of, throwError } from 'rxjs';
-
-interface Product {
-  id: string;
-  title: string;
-  price: number;
-  imageUrl: string;
-  type: string;
-  isAvailable: boolean;
-  categoryIds: string[];
-}
+import { finalize } from 'rxjs';
+import { ProductService } from '../../../core/services/product.service';
+import { Product } from '../../../core/models/product.model';
 
 type Category = { id: string; name: string };
 type LoadState = 'idle' | 'loading' | 'error';
@@ -26,6 +18,7 @@ type LoadState = 'idle' | 'loading' | 'error';
 })
 export class AdminProductListComponent {
   private readonly router = inject(Router);
+  private readonly productService = inject(ProductService);
   readonly Math = Math;
 
   readonly state = signal<LoadState>('idle');
@@ -45,8 +38,7 @@ export class AdminProductListComponent {
     return map;
   });
 
-  // Mock product data
-  readonly products = signal<Product[]>(this.buildMockProducts());
+  readonly products = signal<Product[]>([]);
 
   // Pagination
   readonly pageSize = 10;
@@ -73,6 +65,27 @@ export class AdminProductListComponent {
   readonly deleteModalOpen = signal(false);
   readonly selectedToDelete = signal<Product | null>(null);
   readonly deletingId = signal<string | null>(null);
+
+  constructor() {
+    this.load();
+  }
+
+  private load(): void {
+    this.state.set('loading');
+    this.errorMessage.set(null);
+
+    this.productService.getProducts().subscribe({
+      next: (items) => {
+        this.products.set(items ?? []);
+        this.state.set('idle');
+        this.setPage(1);
+      },
+      error: (err: unknown) => {
+        this.state.set('error');
+        this.errorMessage.set(err instanceof Error ? err.message : 'Không thể tải danh sách sản phẩm.');
+      }
+    });
+  }
 
   openDeleteModal(p: Product): void {
     if (this.deletingId()) return;
@@ -106,7 +119,8 @@ export class AdminProductListComponent {
     this.deletingId.set(target.id);
     this.errorMessage.set(null);
 
-    this.mockDeleteProduct(target.id)
+    this.productService
+      .deleteProduct(target.id)
       .pipe(finalize(() => this.deletingId.set(null)))
       .subscribe({
         next: () => {
@@ -122,12 +136,6 @@ export class AdminProductListComponent {
           this.errorMessage.set(err instanceof Error ? err.message : 'Xoá sản phẩm thất bại. Vui lòng thử lại.');
         }
       });
-  }
-
-  private mockDeleteProduct(id: string) {
-    // Placeholder for future DELETE /products/{id}
-    const exists = this.products().some(p => p.id === id);
-    return exists ? of(true).pipe(delay(650)) : throwError(() => new Error('Không tìm thấy sản phẩm.')).pipe(delay(650));
   }
 
   goToCreate(): void {
@@ -158,42 +166,6 @@ export class AdminProductListComponent {
 
   nextPage(): void {
     this.setPage(this.page() + 1);
-  }
-
-  private buildMockProducts(): Product[] {
-    const imgs = [
-      'https://images.unsplash.com/photo-1541963463532-d68292c34b19?auto=format&fit=crop&w=600&q=60',
-      'https://images.unsplash.com/photo-1500462918059-b1a0cb512f1d?auto=format&fit=crop&w=600&q=60',
-      'https://images.unsplash.com/photo-1520699918507-5423f26f25b4?auto=format&fit=crop&w=600&q=60'
-    ];
-
-    const typePool = ['canvas', 'poster', 'frame'];
-    const categoryPool = [
-      '7f2e0e67-7d1f-4d94-8a2c-97f18fd2f8d1',
-      'b5d92c20-cc92-4fd2-8c89-f4d2e0c1d933',
-      '40a8a9d2-4f8f-45d3-8d5d-6424c1aef9a0',
-      '0c5bfc1b-48c2-4b0c-a2b9-08b9c69f6e1b'
-    ];
-
-    const out: Product[] = [];
-    for (let i = 1; i <= 23; i++) {
-      const id = `prd_${String(i).padStart(3, '0')}`;
-      const type = typePool[i % typePool.length];
-      const isAvailable = i % 5 !== 0;
-      const price = 850_000 + i * 125_000;
-      const categoryIds = i % 3 === 0 ? [categoryPool[0], categoryPool[2]] : [categoryPool[i % categoryPool.length]];
-
-      out.push({
-        id,
-        title: `Tác phẩm #${i} — ${type.toUpperCase()}`,
-        price,
-        imageUrl: imgs[i % imgs.length],
-        type,
-        isAvailable,
-        categoryIds
-      });
-    }
-    return out;
   }
 }
 

@@ -1,0 +1,37 @@
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <div class="admin-sidebar__header">
+      <div class="admin-sidebar__brand">
+        <span class="admin-sidebar__brand-mark">AG</span>
+        <div class="admin-sidebar__brand-text">
+          <div class="admin-sidebar__brand-title">Admin</div>
+          <div class="admin-sidebar__brand-subtitle">Art Gallery</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="admin-sidebar__nav">
+      <a
+        *ngFor="let item of navItems"
+        [routerLink]="item.route"
+        routerLinkActive="is-active"
+        class="admin-sidebar__link"
+      >
+        <span class="admin-sidebar__icon" aria-hidden="true">{{ item.icon }}</span>
+        <span class="admin-sidebar__label">{{ item.label }}</span>
+      </a>
+    </nav>
+
+    <div class="admin-sidebar__footer">
+      <button type="button" class="admin-sidebar__logout" (click)="logout()">
+        <span aria-hidden="true">⎋</span>
+        <span>Logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <router-outlet />
+  </main>
+</div>
+

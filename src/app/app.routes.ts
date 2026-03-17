@@ -8,13 +8,32 @@ import { AdminLoginComponent } from './pages/admin/admin-login/admin-login.compo
 import { AdminProductCreateComponent } from './pages/admin/admin-product-create/admin-product-create.component';
 import { AdminProductListComponent } from './pages/admin/admin-product-list/admin-product-list.component';
 import { AdminProductEditComponent } from './pages/admin/admin-product-edit/admin-product-edit.component';
+import { adminAuthGuard } from './core/auth/admin-auth.guard';
+import { AdminLayoutComponent } from './admin/layout/admin-layout.component';
+import { AdminCategoryListComponent } from './pages/admin/admin-category-list/admin-category-list.component';
+import { AdminCategoryCreateComponent } from './pages/admin/admin-category-create/admin-category-create.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
-    { path: 'admin/login', component: AdminLoginComponent },
-    { path: 'admin/products', component: AdminProductListComponent },
-    { path: 'admin/products/create', component: AdminProductCreateComponent },
-    { path: 'admin/products/edit/:id', component: AdminProductEditComponent },
+    {
+      path: 'admin',
+      children: [
+        { path: 'login', component: AdminLoginComponent },
+        {
+          path: '',
+          component: AdminLayoutComponent,
+          canActivate: [adminAuthGuard],
+          children: [
+            { path: 'products', component: AdminProductListComponent },
+            { path: 'products/create', component: AdminProductCreateComponent },
+            { path: 'products/edit/:id', component: AdminProductEditComponent },
+            { path: 'categories', component: AdminCategoryListComponent },
+            { path: 'categories/create', component: AdminCategoryCreateComponent },
+            { path: '', pathMatch: 'full', redirectTo: 'products' }
+          ]
+        }
+      ]
+    },
     { path: 'about', component: AboutUsComponent },
     { path: 'products', component: ProductListComponent },
     { path: 'products/:id', component: ProductDetailComponent },

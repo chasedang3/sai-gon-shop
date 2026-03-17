@@ -2,8 +2,9 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { finalize } from 'rxjs';
+import { finalize, map, startWith } from 'rxjs';
 import { AuthService } from '../../../core/auth/auth.service';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 type LoginState = 'idle' | 'loading' | 'success' | 'error';
 
@@ -29,7 +30,15 @@ export class AdminLoginComponent {
     password: ['', [Validators.required]]
   });
 
-  readonly canSubmit = computed(() => this.form.valid && this.state() !== 'loading');
+  private readonly formValid = toSignal(
+    this.form.statusChanges.pipe(
+      startWith(this.form.status),
+      map(() => this.form.valid)
+    ),
+    { initialValue: this.form.valid }
+  );
+
+  readonly canSubmit = computed(() => this.formValid() && this.state() !== 'loading');
 
   togglePasswordVisibility(): void {
     this.passwordVisible.update(v => !v);
@@ -60,15 +69,15 @@ export class AdminLoginComponent {
         })
       )
       .subscribe({
-        next: () => {
+        next: (ok) => {
+          if (!ok) {
+            this.state.set('error');
+            this.errorMessage.set('Email hoặc mật khẩu không đúng.');
+            return;
+          }
+
           this.state.set('success');
-          // Mock success handling: redirect to an admin landing page later.
-          // For now, route to home (or update to /admin when you create it).
-          void this.router.navigateByUrl('/');
-        },
-        error: (err: unknown) => {
-          this.state.set('error');
-          this.errorMessage.set(err instanceof Error ? err.message : 'Đăng nhập thất bại. Vui lòng thử lại.');
+          void this.router.navigateByUrl('/admin/products');
         }
       });
   }

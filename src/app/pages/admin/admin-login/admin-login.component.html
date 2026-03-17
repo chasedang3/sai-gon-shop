@@ -56,9 +56,13 @@
                   [class.border-rose-300]="emailCtrl.touched && emailCtrl.invalid"
                   [class.focus:border-rose-400]="emailCtrl.touched && emailCtrl.invalid"
                   [class.focus:ring-rose-50]="emailCtrl.touched && emailCtrl.invalid"
-                  placeholder="admin.company.com"
+                  placeholder="admin&#64;artgallery.com"
                 />
               </div>
+
+              <p class="mt-2 text-xs text-slate-500">
+                Mock account: <span class="font-medium">admin&#64;artgallery.com</span> / <span class="font-medium">admin123</span>
+              </p>
 
               <p *ngIf="emailCtrl.touched && emailCtrl.hasError('required')" class="mt-2 text-xs text-rose-600">
                 Vui lòng nhập email.

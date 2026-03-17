@@ -1,37 +1,47 @@
 import { Injectable } from '@angular/core';
-import { Observable, delay, map, of, throwError } from 'rxjs';
+import { Observable, delay, of } from 'rxjs';
 
-export type AdminAuthResult = {
-  token: string;
-  adminEmail: string;
-};
+const STORAGE_KEY = 'admin_logged_in';
+
+const MOCK_ADMIN_EMAIL = 'admin@artgallery.com';
+const MOCK_ADMIN_PASSWORD = 'admin123';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   /**
-   * Mock admin authentication.
-   * Replace this implementation with a real API call later.
+   * Temporary mock admin authentication.
+   * Replace with real API call (JWT) later.
    */
-  login(email: string, password: string): Observable<AdminAuthResult> {
+  login(email: string, password: string): Observable<boolean> {
     const normalizedEmail = (email ?? '').trim().toLowerCase();
+    const normalizedPassword = (password ?? '').trim();
 
-    // Intentionally *not* in template; this is mock-only logic.
-    const isValidMock =
-      normalizedEmail.length > 0 &&
-      password.length > 0 &&
-      password === 'Admin@1234';
+    const ok =
+      normalizedEmail === MOCK_ADMIN_EMAIL &&
+      normalizedPassword === MOCK_ADMIN_PASSWORD;
 
-    if (!isValidMock) {
-      return throwError(() => new Error('Email hoặc mật khẩu không đúng.')).pipe(delay(650));
+    if (ok) {
+      this.setLoggedIn(true);
     }
 
-    return of(true).pipe(
-      delay(650),
-      map(() => ({
-        token: 'mock-admin-token',
-        adminEmail: normalizedEmail
-      }))
-    );
+    // Simulate async behavior like a real API call.
+    return of(ok).pipe(delay(450));
+  }
+
+  logout(): void {
+    this.setLoggedIn(false);
+  }
+
+  isLoggedIn(): boolean {
+    return localStorage.getItem(STORAGE_KEY) === 'true';
+  }
+
+  private setLoggedIn(value: boolean): void {
+    if (value) {
+      localStorage.setItem(STORAGE_KEY, 'true');
+      return;
+    }
+    localStorage.removeItem(STORAGE_KEY);
   }
 }
 

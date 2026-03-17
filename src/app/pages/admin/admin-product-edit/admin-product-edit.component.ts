@@ -3,7 +3,8 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
-import { AdminProductService, ProductEditModel, ProductType } from '../../../core/products/admin-product.service';
+import { ProductService } from '../../../core/services/product.service';
+import { Product } from '../../../core/models/product.model';
 
 type Category = { id: string; name: string };
 type PageState = 'loading' | 'ready' | 'saving' | 'success' | 'error';
@@ -24,7 +25,7 @@ export class AdminProductEditComponent {
   private readonly fb = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly productService = inject(AdminProductService);
+  private readonly productService = inject(ProductService);
 
   readonly state = signal<PageState>('loading');
   readonly errorMessage = signal<string | null>(null);
@@ -40,7 +41,7 @@ export class AdminProductEditComponent {
     description: ['', [Validators.required]],
     price: this.fb.nonNullable.control(0, [Validators.required, Validators.min(1)]),
     imageUrl: ['', [Validators.required]],
-    type: this.fb.nonNullable.control<ProductType>('canvas', [Validators.required]),
+    type: this.fb.nonNullable.control<string>('canvas', [Validators.required]),
     isAvailable: this.fb.nonNullable.control(true),
     categoryIds: this.fb.nonNullable.control<string[]>([], [
       control => (hasAtLeastOneCategory(control.value) ? null : { minSelected: true })
@@ -72,7 +73,7 @@ export class AdminProductEditComponent {
     this.errorMessage.set(null);
     this.form.disable({ emitEvent: false });
 
-    this.productService.getById(id).subscribe({
+    this.productService.getProductById(id).subscribe({
       next: entity => {
         this.form.patchValue({
           title: entity.title,
@@ -133,13 +134,13 @@ export class AdminProductEditComponent {
     this.state.set('saving');
     this.form.disable({ emitEvent: false });
 
-    const payload: ProductEditModel = this.form.getRawValue();
+    const payload: Partial<Product> = this.form.getRawValue();
 
     // eslint-disable-next-line no-console
     console.log('[AdminProductEdit] payload', { id, ...payload });
 
     this.productService
-      .update(id, payload)
+      .updateProduct(id, payload)
       .pipe(
         finalize(() => {
           // If update failed, form is re-enabled in error handler. If success, we navigate away.

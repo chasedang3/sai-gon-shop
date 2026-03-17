@@ -1,0 +1,83 @@
+<div class="space-y-5">
+  <div class="flex items-start justify-between gap-4">
+    <div>
+      <h1 class="text-xl font-semibold text-slate-900">Thêm danh mục</h1>
+      <p class="mt-1 text-sm text-slate-600">Tạo danh mục mới để phân loại sản phẩm.</p>
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage() as msg" class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+    {{ msg }}
+  </div>
+
+  <div class="mx-auto w-full max-w-2xl">
+    <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-900/5">
+      <form class="space-y-5" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div>
+          <label for="name" class="block text-sm font-semibold text-slate-700">
+            Tên danh mục <span class="text-rose-600">*</span>
+          </label>
+          <div class="mt-2">
+            <input
+              id="name"
+              type="text"
+              formControlName="name"
+              placeholder="Ví dụ: Phong cảnh"
+              class="block w-full rounded-xl border bg-white px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition
+                border-slate-200 focus:border-slate-900/40 focus:ring-4 focus:ring-slate-900/10"
+              [class.border-rose-300]="nameCtrl.touched && nameCtrl.invalid"
+              [class.focus:border-rose-400]="nameCtrl.touched && nameCtrl.invalid"
+              [class.focus:ring-rose-50]="nameCtrl.touched && nameCtrl.invalid"
+            />
+          </div>
+
+          <p *ngIf="nameCtrl.touched && nameCtrl.hasError('required')" class="mt-2 text-xs text-rose-600">
+            Vui lòng nhập tên danh mục.
+          </p>
+        </div>
+
+        <div>
+          <label for="description" class="block text-sm font-semibold text-slate-700">
+            Mô tả
+          </label>
+          <div class="mt-2">
+            <textarea
+              id="description"
+              rows="4"
+              formControlName="description"
+              placeholder="Mô tả ngắn về danh mục"
+              class="block w-full resize-y rounded-xl border bg-white px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition
+                border-slate-200 focus:border-slate-900/40 focus:ring-4 focus:ring-slate-900/10"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2">
+          <button
+            type="button"
+            class="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700
+              hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-slate-900/10 disabled:cursor-not-allowed disabled:opacity-60"
+            (click)="cancel()"
+            [disabled]="state() === 'loading'"
+          >
+            Huỷ
+          </button>
+
+          <button
+            type="submit"
+            class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm
+              hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-900/20 disabled:cursor-not-allowed disabled:opacity-60"
+            [disabled]="!canSubmit()"
+          >
+            <span *ngIf="state() !== 'loading'">Tạo danh mục</span>
+            <span *ngIf="state() === 'loading'" class="inline-flex items-center gap-2">
+              <span class="h-4 w-4 animate-spin rounded-full border-2 border-slate-200 border-t-white"></span>
+              Đang tạo...
+            </span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+

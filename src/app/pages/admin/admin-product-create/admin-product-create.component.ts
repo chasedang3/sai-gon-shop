@@ -2,19 +2,13 @@ import { NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { delay, finalize, of, throwError } from 'rxjs';
+import { finalize } from 'rxjs';
+import { ProductService } from '../../../core/services/product.service';
+import { Product } from '../../../core/models/product.model';
 
 type ProductType = 'canvas' | 'poster' | 'frame';
 
-type ProductCreateModel = {
-  title: string;
-  description: string;
-  price: number;
-  imageUrl: string;
-  type: ProductType;
-  isAvailable: boolean;
-  categoryIds: string[];
-};
+type ProductCreateModel = Omit<Product, 'id'> & { type: ProductType };
 
 type Category = { id: string; name: string };
 type SubmitState = 'idle' | 'loading' | 'success' | 'error';
@@ -34,6 +28,7 @@ function hasAtLeastOneCategory(value: unknown): boolean {
 export class AdminProductCreateComponent {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
+  private readonly productService = inject(ProductService);
 
   readonly state = signal<SubmitState>('idle');
   readonly errorMessage = signal<string | null>(null);
@@ -87,12 +82,6 @@ export class AdminProductCreateComponent {
     void this.router.navigateByUrl('/');
   }
 
-  private mockCreateProduct(payload: ProductCreateModel) {
-    // Placeholder for future POST /products
-    const ok = payload.title.trim().length > 0;
-    return ok ? of({ id: crypto.randomUUID() }).pipe(delay(700)) : throwError(() => new Error('Dữ liệu không hợp lệ.')).pipe(delay(700));
-  }
-
   submit(): void {
     this.errorMessage.set(null);
 
@@ -109,7 +98,8 @@ export class AdminProductCreateComponent {
     // eslint-disable-next-line no-console
     console.log('[AdminProductCreate] payload', payload);
 
-    this.mockCreateProduct(payload)
+    this.productService
+      .createProduct(payload)
       .pipe(
         finalize(() => {
           if (this.state() === 'loading') this.state.set('idle');
