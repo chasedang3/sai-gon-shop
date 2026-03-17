@@ -7,12 +7,14 @@ import { CanvasHangingGuideComponent } from './pages/blog/canvas-hanging-guide.c
 import { AdminLoginComponent } from './pages/admin/admin-login/admin-login.component';
 import { AdminProductCreateComponent } from './pages/admin/admin-product-create/admin-product-create.component';
 import { AdminProductListComponent } from './pages/admin/admin-product-list/admin-product-list.component';
+import { AdminProductEditComponent } from './pages/admin/admin-product-edit/admin-product-edit.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
     { path: 'admin/login', component: AdminLoginComponent },
     { path: 'admin/products', component: AdminProductListComponent },
     { path: 'admin/products/create', component: AdminProductCreateComponent },
+    { path: 'admin/products/edit/:id', component: AdminProductEditComponent },
     { path: 'about', component: AboutUsComponent },
     { path: 'products', component: ProductListComponent },
     { path: 'products/:id', component: ProductDetailComponent },

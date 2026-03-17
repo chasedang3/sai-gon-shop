@@ -135,8 +135,7 @@ export class AdminProductListComponent {
   }
 
   goToEdit(p: Product): void {
-    // Placeholder route for future edit page
-    void this.router.navigate(['/admin/products', p.id, 'edit']);
+    void this.router.navigate(['/admin/products/edit', p.id]);
   }
 
   formatVnd(price: number): string {
