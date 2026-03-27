@@ -23,7 +23,8 @@ export class AdminLayoutComponent {
 
   readonly navItems: AdminNavItem[] = [
     { label: 'Products', icon: '📦', route: '/admin/products' },
-    { label: 'Categories', icon: '🏷️', route: '/admin/categories' }
+    { label: 'Categories', icon: '🏷️', route: '/admin/categories' },
+    { label: 'Upload Image', icon: '🖼️', route: '/admin/upload' }
   ];
 
   logout(): void {

@@ -12,6 +12,7 @@ import { Product } from '../models/product.model';
 @Injectable({ providedIn: 'root' })
 export class ProductService {
   private readonly apiUrl = `${environment.apiUrl}/products`;
+  private readonly artworksApiUrl = `${environment.apiUrl}/Artworks`;
 
   constructor(private readonly http: HttpClient) {}
 
@@ -31,36 +32,51 @@ export class ProductService {
       .get<Product[] | { items: Product[] }>(this.apiUrl, { params: httpParams })
       .pipe(
         map((res) => (Array.isArray(res) ? res : res.items)),
-        catchError((err) => this.handleError(err, 'Không thể tải danh sách sản phẩm.'))
+        catchError((err) =>
+          this.handleError(err, 'Không thể tải danh sách sản phẩm.', 'Không tìm thấy API danh sách sản phẩm.')
+        )
       );
   }
 
   getProductById(id: string): Observable<Product> {
     return this.http
       .get<Product>(`${this.apiUrl}/${encodeURIComponent(id)}`)
-      .pipe(catchError((err) => this.handleError(err, 'Không thể tải thông tin sản phẩm.')));
+      .pipe(catchError((err) => this.handleError(err, 'Không thể tải thông tin sản phẩm.', 'Không tìm thấy sản phẩm.')));
   }
 
-  createProduct(payload: Omit<Product, 'id'>): Observable<Product> {
+  createProduct(payload: Omit<Product, 'id'>): Observable<void> {
     return this.http
-      .post<Product>(this.apiUrl, payload, { headers: this.buildHeaders() })
-      .pipe(catchError((err) => this.handleError(err, 'Không thể tạo sản phẩm.')));
+      .post(this.artworksApiUrl, payload, { headers: this.buildHeaders(), responseType: 'text' })
+      .pipe(
+        map(() => void 0),
+        catchError((err) =>
+          this.handleError(err, 'Không thể tạo sản phẩm.', 'Không tìm thấy API tạo sản phẩm (POST /Artworks).')
+        )
+      );
   }
 
-  updateProduct(id: string, payload: Partial<Product>): Observable<Product> {
+  updateProduct(id: string, payload: Partial<Product>): Observable<void> {
     return this.http
-      .put<Product>(`${this.apiUrl}/${encodeURIComponent(id)}`, payload, {
-        headers: this.buildHeaders()
+      .put(`${this.artworksApiUrl}/${encodeURIComponent(id)}`, payload, {
+        headers: this.buildHeaders(),
+        responseType: 'text'
       })
-      .pipe(catchError((err) => this.handleError(err, 'Không thể cập nhật sản phẩm.')));
+      .pipe(
+        map(() => void 0),
+        catchError((err) => this.handleError(err, 'Không thể cập nhật sản phẩm.', 'Không tìm thấy sản phẩm.'))
+      );
   }
 
   deleteProduct(id: string): Observable<void> {
     return this.http
-      .delete<void>(`${this.apiUrl}/${encodeURIComponent(id)}`, {
-        headers: this.buildHeaders()
+      .delete(`${this.artworksApiUrl}/${encodeURIComponent(id)}`, {
+        headers: this.buildHeaders(),
+        responseType: 'text'
       })
-      .pipe(catchError((err) => this.handleError(err, 'Không thể xóa sản phẩm.')));
+      .pipe(
+        map(() => void 0),
+        catchError((err) => this.handleError(err, 'Không thể xóa sản phẩm.', 'Không tìm thấy sản phẩm.'))
+      );
   }
 
   /**
@@ -70,24 +86,24 @@ export class ProductService {
     return new HttpHeaders({ 'Content-Type': 'application/json' });
   }
 
-  private handleError(error: unknown, fallbackMessage: string): Observable<never> {
+  private handleError(error: unknown, fallbackMessage: string, notFoundMessage: string = fallbackMessage): Observable<never> {
     // eslint-disable-next-line no-console
     console.error('[ProductService] API error', error);
 
     if (error instanceof HttpErrorResponse) {
-      const message = this.toUserMessage(error, fallbackMessage);
+      const message = this.toUserMessage(error, fallbackMessage, notFoundMessage);
       return throwError(() => new Error(message));
     }
 
     return throwError(() => new Error(fallbackMessage));
   }
 
-  private toUserMessage(error: HttpErrorResponse, fallbackMessage: string): string {
+  private toUserMessage(error: HttpErrorResponse, fallbackMessage: string, notFoundMessage: string): string {
     if (error.status === 0) return 'Không thể kết nối tới máy chủ. Vui lòng kiểm tra mạng.';
     if (error.status === 400) return 'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.';
     if (error.status === 401) return 'Bạn cần đăng nhập để thực hiện thao tác này.';
     if (error.status === 403) return 'Bạn không có quyền thực hiện thao tác này.';
-    if (error.status === 404) return 'Không tìm thấy sản phẩm.';
+    if (error.status === 404) return notFoundMessage;
     if (error.status >= 500) return 'Máy chủ đang gặp sự cố. Vui lòng thử lại sau.';
 
     const backendMessage =

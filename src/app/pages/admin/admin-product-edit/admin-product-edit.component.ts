@@ -3,11 +3,13 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
+import { Category } from '../../../core/categories/category.model';
+import { CategoryService } from '../../../core/categories/category.service';
 import { ProductService } from '../../../core/services/product.service';
 import { Product } from '../../../core/models/product.model';
 
-type Category = { id: string; name: string };
 type PageState = 'loading' | 'ready' | 'saving' | 'success' | 'error';
+type ProductType = 'canvas' | 'oil';
 
 function hasAtLeastOneCategory(value: unknown): boolean {
   return Array.isArray(value) && value.length > 0;
@@ -25,35 +27,40 @@ export class AdminProductEditComponent {
   private readonly fb = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly categoryService = inject(CategoryService);
   private readonly productService = inject(ProductService);
 
   readonly state = signal<PageState>('loading');
   readonly errorMessage = signal<string | null>(null);
   readonly productId = signal<string | null>(null);
+  readonly categoriesErrorMessage = signal<string | null>(null);
+  readonly isLoadingCategories = signal<boolean>(true);
+  readonly categorySearchTerm = signal<string>('');
 
-  readonly categories = signal<Category[]>([
-    { id: '7f2e0e67-7d1f-4d94-8a2c-97f18fd2f8d1', name: 'Phong cảnh' },
-    { id: 'b5d92c20-cc92-4fd2-8c89-f4d2e0c1d933', name: 'Trừu tượng' }
-  ]);
+  readonly categories = signal<Category[]>([]);
 
   readonly form = this.fb.nonNullable.group({
     title: ['', [Validators.required]],
     description: ['', [Validators.required]],
     price: this.fb.nonNullable.control(0, [Validators.required, Validators.min(1)]),
     imageUrl: ['', [Validators.required]],
-    type: this.fb.nonNullable.control<string>('canvas', [Validators.required]),
+    type: this.fb.nonNullable.control<ProductType>('canvas', [Validators.required]),
     isAvailable: this.fb.nonNullable.control(true),
     categoryIds: this.fb.nonNullable.control<string[]>([], [
       control => (hasAtLeastOneCategory(control.value) ? null : { minSelected: true })
     ])
   });
 
-  readonly imagePreviewUrl = computed(() => {
-    const url = (this.form.controls.imageUrl.value ?? '').trim();
-    return url.length > 0 ? url : null;
-  });
+  readonly filteredCategories = computed(() => {
+    const keyword = this.categorySearchTerm().trim().toLowerCase();
+    if (!keyword) return this.categories();
 
-  readonly canSubmit = computed(() => this.form.valid && this.state() !== 'saving' && this.state() !== 'loading');
+    return this.categories().filter(c => {
+      const name = (c.name ?? '').toLowerCase();
+      const id = c.id.toLowerCase();
+      return name.includes(keyword) || id.includes(keyword);
+    });
+  });
 
   constructor() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -65,7 +72,26 @@ export class AdminProductEditComponent {
     }
 
     this.productId.set(id);
+    this.loadCategories();
     this.load(id);
+  }
+
+  private loadCategories(): void {
+    this.isLoadingCategories.set(true);
+    this.categoriesErrorMessage.set(null);
+
+    this.categoryService.getCategories().subscribe({
+      next: categories => {
+        this.categories.set(categories);
+        this.isLoadingCategories.set(false);
+      },
+      error: (err: unknown) => {
+        this.isLoadingCategories.set(false);
+        this.categoriesErrorMessage.set(
+          err instanceof Error ? err.message : 'Không thể tải danh mục. Vui lòng thử lại.'
+        );
+      }
+    });
   }
 
   private load(id: string): void {
@@ -80,7 +106,7 @@ export class AdminProductEditComponent {
           description: entity.description,
           price: entity.price,
           imageUrl: entity.imageUrl,
-          type: entity.type,
+          type: entity.type === 'oil' ? 'oil' : 'canvas',
           isAvailable: entity.isAvailable,
           categoryIds: [...entity.categoryIds]
         });
@@ -114,6 +140,10 @@ export class AdminProductEditComponent {
     this.form.controls.categoryIds.setValue(next);
     this.form.controls.categoryIds.markAsTouched();
     this.form.controls.categoryIds.updateValueAndValidity({ emitEvent: false });
+  }
+
+  onCategorySearchChange(value: string): void {
+    this.categorySearchTerm.set(value);
   }
 
   cancel(): void {
@@ -176,6 +206,15 @@ export class AdminProductEditComponent {
   }
   get categoryIdsCtrl() {
     return this.form.controls.categoryIds;
+  }
+
+  imagePreviewUrl(): string | null {
+    const url = (this.form.controls.imageUrl.value ?? '').trim();
+    return url.length > 0 ? url : null;
+  }
+
+  canSubmit(): boolean {
+    return this.form.valid && this.state() !== 'saving' && this.state() !== 'loading';
   }
 }
 

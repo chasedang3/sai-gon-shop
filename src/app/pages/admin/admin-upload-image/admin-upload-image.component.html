@@ -1,0 +1,106 @@
+<main class="admin-upload-page">
+  <section class="w-full px-4 py-8 sm:py-12">
+    <div class="mx-auto w-full max-w-4xl">
+      <header class="mb-6">
+        <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Upload hình ảnh</h1>
+        <p class="mt-1 text-sm text-slate-600">
+          Upload ảnh để lấy URL và tái sử dụng cho trang tạo/chỉnh sửa sản phẩm.
+        </p>
+      </header>
+
+      <div class="rounded-2xl bg-white shadow-[0_20px_60px_rgba(15,23,42,0.10)] ring-1 ring-slate-900/5">
+        <div class="p-6 sm:p-8">
+          <div *ngIf="errorMessage() as error" class="mb-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+            {{ error }}
+          </div>
+
+          <div
+            *ngIf="state() === 'success'"
+            class="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
+          >
+            ✅ Upload ảnh thành công.
+          </div>
+
+          <form [formGroup]="form" (ngSubmit)="uploadImage()" novalidate>
+            <div class="space-y-6">
+              <div>
+                <label for="uploadFile" class="admin-label">Chọn file ảnh</label>
+                <input
+                  #fileInput
+                  id="uploadFile"
+                  name="uploadFile"
+                  type="file"
+                  accept="image/*"
+                  required
+                  class="admin-input-file"
+                  (change)="onFileSelected($event)"
+                />
+                <p *ngIf="selectedFile() as file" class="mt-2 text-sm text-slate-600">
+                  File đã chọn: <span class="font-medium text-slate-800">{{ file.name }}</span>
+                </p>
+              </div>
+
+              <div class="flex flex-col gap-3 sm:flex-row">
+                <button
+                  type="submit"
+                  class="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-900/20 disabled:cursor-not-allowed disabled:opacity-60"
+                  [disabled]="state() === 'loading' || !selectedFile()"
+                >
+                  <span *ngIf="state() !== 'loading'">Upload ảnh</span>
+                  <span *ngIf="state() === 'loading'" class="inline-flex items-center gap-2">
+                    <span class="admin-upload-page__spinner" aria-hidden="true"></span>
+                    Đang upload...
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-slate-900/10 disabled:cursor-not-allowed disabled:opacity-60"
+                  [disabled]="state() === 'loading'"
+                  (click)="resetForm(fileInput)"
+                >
+                  Reset
+                </button>
+              </div>
+            </div>
+          </form>
+
+          <section *ngIf="uploadedImageUrl() as imageUrl" class="mt-8 border-t border-slate-200 pt-6">
+            <h2 class="text-sm font-semibold text-slate-900">Kết quả upload</h2>
+
+            <div class="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
+              <div class="aspect-[4/3] w-full bg-slate-100">
+                <img
+                  *ngIf="uploadedImagePreview() as preview"
+                  [src]="preview"
+                  alt="Uploaded image preview"
+                  class="h-full w-full object-cover"
+                />
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <label for="uploadedUrl" class="admin-label">Image URL</label>
+              <input id="uploadedUrl" type="text" class="admin-input" [value]="imageUrl" readonly />
+            </div>
+
+            <div class="mt-3 flex items-center gap-3">
+              <button
+                type="button"
+                class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-slate-900/10"
+                (click)="copyImageUrl()"
+              >
+                Copy link ảnh
+              </button>
+
+              <p *ngIf="copiedMessage()" class="text-sm text-emerald-700">
+                {{ copiedMessage() }}
+              </p>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+

@@ -12,6 +12,7 @@ import { adminAuthGuard } from './core/auth/admin-auth.guard';
 import { AdminLayoutComponent } from './admin/layout/admin-layout.component';
 import { AdminCategoryListComponent } from './pages/admin/admin-category-list/admin-category-list.component';
 import { AdminCategoryCreateComponent } from './pages/admin/admin-category-create/admin-category-create.component';
+import { AdminUploadImageComponent } from './pages/admin/admin-upload-image/admin-upload-image.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -29,6 +30,7 @@ export const routes: Routes = [
             { path: 'products/edit/:id', component: AdminProductEditComponent },
             { path: 'categories', component: AdminCategoryListComponent },
             { path: 'categories/create', component: AdminCategoryCreateComponent },
+            { path: 'upload', component: AdminUploadImageComponent },
             { path: '', pathMatch: 'full', redirectTo: 'products' }
           ]
         }
