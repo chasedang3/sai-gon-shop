@@ -9,9 +9,18 @@ import { Observable, catchError, map, throwError } from 'rxjs';
 import { environment } from '../../../../environment';
 import { Product } from '../models/product.model';
 
+type ArtworkCategoryDto = {
+  id?: string;
+  name?: string;
+};
+
+type ArtworkDto = Partial<Omit<Product, 'categoryIds'>> & {
+  categories?: ArtworkCategoryDto[];
+  categoryIds?: string[];
+};
+
 @Injectable({ providedIn: 'root' })
 export class ProductService {
-  private readonly apiUrl = `${environment.apiUrl}/products`;
   private readonly artworksApiUrl = `${environment.apiUrl}/Artworks`;
 
   constructor(private readonly http: HttpClient) {}
@@ -21,17 +30,22 @@ export class ProductService {
     pageSize?: number;
     categoryId?: string;
     isAvailable?: boolean;
+    all?: boolean;
   }): Observable<Product[]> {
     let httpParams = new HttpParams();
     if (params?.page != null) httpParams = httpParams.set('page', String(params.page));
     if (params?.pageSize != null) httpParams = httpParams.set('pageSize', String(params.pageSize));
     if (params?.categoryId) httpParams = httpParams.set('categoryId', params.categoryId);
     if (params?.isAvailable != null) httpParams = httpParams.set('isAvailable', String(params.isAvailable));
+    if (params?.all != null) httpParams = httpParams.set('all', String(params.all));
 
     return this.http
-      .get<Product[] | { items: Product[] }>(this.apiUrl, { params: httpParams })
+      .get<ArtworkDto[] | { items: ArtworkDto[] }>(this.artworksApiUrl, { params: httpParams })
       .pipe(
-        map((res) => (Array.isArray(res) ? res : res.items)),
+        map((res) => {
+          const items = Array.isArray(res) ? res : res.items;
+          return (items ?? []).map((item) => this.toProduct(item));
+        }),
         catchError((err) =>
           this.handleError(err, 'Không thể tải danh sách sản phẩm.', 'Không tìm thấy API danh sách sản phẩm.')
         )
@@ -39,9 +53,37 @@ export class ProductService {
   }
 
   getProductById(id: string): Observable<Product> {
+    const notFoundError = () => new Error('Không tìm thấy sản phẩm.');
+
     return this.http
-      .get<Product>(`${this.apiUrl}/${encodeURIComponent(id)}`)
-      .pipe(catchError((err) => this.handleError(err, 'Không thể tải thông tin sản phẩm.', 'Không tìm thấy sản phẩm.')));
+      .get<ArtworkDto>(`${this.artworksApiUrl}/${encodeURIComponent(id)}`)
+      .pipe(
+        map((res) => this.toProduct(res)),
+        catchError((err: unknown) => {
+          if (!(err instanceof HttpErrorResponse) || err.status !== 404) {
+            return this.handleError(err, 'Không thể tải thông tin sản phẩm.', 'Không tìm thấy sản phẩm.');
+          }
+
+          const params = new HttpParams().set('id', id);
+          return this.http
+            .get<ArtworkDto | { items?: ArtworkDto[] }>(this.artworksApiUrl, { params })
+            .pipe(
+              map((res) => {
+                if ('items' in res && Array.isArray(res.items)) {
+                  return res.items[0];
+                }
+                return res as ArtworkDto;
+              }),
+              map((entity) => {
+                if (!entity) throw notFoundError();
+                return this.toProduct(entity);
+              }),
+              catchError((innerErr: unknown) =>
+                this.handleError(innerErr, 'Không thể tải thông tin sản phẩm.', 'Không tìm thấy sản phẩm.')
+              )
+            );
+        })
+      );
   }
 
   createProduct(payload: Omit<Product, 'id'>): Observable<void> {
@@ -115,6 +157,28 @@ export class ProductService {
       '';
 
     return backendMessage.trim() || fallbackMessage;
+  }
+
+  private toProduct(entity: ArtworkDto): Product {
+    const categories = Array.isArray(entity.categories) ? entity.categories : [];
+    const categoryIdsFromCategories = categories
+      .map((c) => c?.id)
+      .filter((id): id is string => typeof id === 'string' && id.trim().length > 0);
+    const categoryIds =
+      Array.isArray(entity.categoryIds) && entity.categoryIds.length > 0
+        ? entity.categoryIds
+        : categoryIdsFromCategories;
+
+    return {
+      id: typeof entity.id === 'string' ? entity.id : '',
+      title: typeof entity.title === 'string' ? entity.title : '',
+      description: typeof entity.description === 'string' ? entity.description : '',
+      price: typeof entity.price === 'number' ? entity.price : 0,
+      imageUrl: typeof entity.imageUrl === 'string' ? entity.imageUrl : '',
+      type: typeof entity.type === 'string' ? entity.type : 'canvas',
+      isAvailable: typeof entity.isAvailable === 'boolean' ? entity.isAvailable : true,
+      categoryIds
+    };
   }
 }
 

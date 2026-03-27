@@ -2,10 +2,11 @@ import { NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
+import { CategoryService } from '../../../core/categories/category.service';
 import { ProductService } from '../../../core/services/product.service';
 import { Product } from '../../../core/models/product.model';
+import { Category } from '../../../core/categories/category.model';
 
-type Category = { id: string; name: string };
 type LoadState = 'idle' | 'loading' | 'error';
 
 @Component({
@@ -18,19 +19,14 @@ type LoadState = 'idle' | 'loading' | 'error';
 })
 export class AdminProductListComponent {
   private readonly router = inject(Router);
+  private readonly categoryService = inject(CategoryService);
   private readonly productService = inject(ProductService);
   readonly Math = Math;
 
   readonly state = signal<LoadState>('idle');
   readonly errorMessage = signal<string | null>(null);
 
-  // Mock categories (IDs match create page examples)
-  readonly categories = signal<Category[]>([
-    { id: '7f2e0e67-7d1f-4d94-8a2c-97f18fd2f8d1', name: 'Phong cảnh' },
-    { id: 'b5d92c20-cc92-4fd2-8c89-f4d2e0c1d933', name: 'Trừu tượng' },
-    { id: '40a8a9d2-4f8f-45d3-8d5d-6424c1aef9a0', name: 'Tối giản' },
-    { id: '0c5bfc1b-48c2-4b0c-a2b9-08b9c69f6e1b', name: 'Chân dung' }
-  ]);
+  readonly categories = signal<Category[]>([]);
 
   private readonly categoryNameById = computed(() => {
     const map = new Map<string, string>();
@@ -41,7 +37,7 @@ export class AdminProductListComponent {
   readonly products = signal<Product[]>([]);
 
   // Pagination
-  readonly pageSize = 10;
+  readonly pageSize = 12;
   readonly page = signal(1);
 
   readonly total = computed(() => this.products().length);
@@ -67,14 +63,28 @@ export class AdminProductListComponent {
   readonly deletingId = signal<string | null>(null);
 
   constructor() {
+    this.loadCategories();
     this.load();
+  }
+
+  private loadCategories(): void {
+    this.categoryService.getCategories().subscribe({
+      next: (items) => this.categories.set(items ?? []),
+      error: () => this.categories.set([])
+    });
   }
 
   private load(): void {
     this.state.set('loading');
     this.errorMessage.set(null);
 
-    this.productService.getProducts().subscribe({
+    this.productService
+      .getProducts({
+        page: 1,
+        pageSize: this.pageSize,
+        all: false
+      })
+      .subscribe({
       next: (items) => {
         this.products.set(items ?? []);
         this.state.set('idle');
