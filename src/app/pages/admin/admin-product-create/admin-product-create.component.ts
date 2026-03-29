@@ -8,7 +8,7 @@ import { CategoryService } from '../../../core/categories/category.service';
 import { ProductService } from '../../../core/services/product.service';
 import { Product } from '../../../core/models/product.model';
 
-type ProductType = 'canvas' | 'oil';
+type ProductType = 'Canvas' | 'SonDau' | 'TrangGuong';
 
 type ProductCreateModel = Omit<Product, 'id'> & { type: ProductType };
 
@@ -45,7 +45,7 @@ export class AdminProductCreateComponent {
     description: ['', [Validators.required]],
     price: this.fb.nonNullable.control(0, [Validators.required, Validators.min(1)]),
     imageUrl: ['', [Validators.required]],
-    type: this.fb.nonNullable.control<ProductType>('canvas', [Validators.required]),
+    type: this.fb.nonNullable.control<ProductType>('Canvas', [Validators.required]),
     isAvailable: this.fb.nonNullable.control(true),
     categoryIds: this.fb.nonNullable.control<string[]>([], [
       control => (hasAtLeastOneCategory(control.value) ? null : { minSelected: true })
@@ -146,7 +146,7 @@ export class AdminProductCreateComponent {
             description: '',
             price: 0,
             imageUrl: '',
-            type: 'canvas',
+            type: 'Canvas',
             isAvailable: true,
             categoryIds: []
           });

@@ -210,8 +210,9 @@
                         class="admin-select"
                         [class.admin-input--invalid]="typeCtrl.touched && typeCtrl.invalid"
                       >
-                        <option value="canvas">Canvas</option>
-                        <option value="oil">Sơn dầu</option>
+                        <option value="Canvas">Canvas</option>
+                        <option value="SonDau">Sơn dầu</option>
+                        <option value="TrangGuong">Tráng gương</option>
                       </select>
                       <p *ngIf="typeCtrl.touched && typeCtrl.hasError('required')" class="admin-error">
                         Vui lòng chọn loại sản phẩm.

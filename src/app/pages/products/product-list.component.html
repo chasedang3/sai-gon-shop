@@ -8,6 +8,29 @@
         Quản lý bộ sưu tập tranh và sản phẩm decor
       </p>
 
+      <div class="artwork-type-filter" role="group" aria-label="Lọc theo loại tranh">
+        <span class="artwork-type-filter-label">Loại tranh</span>
+        <div class="artwork-type-filter-buttons">
+          <button
+            type="button"
+            class="artwork-type-pill"
+            [class.artwork-type-pill--active]="!selectedArtworkType()"
+            (click)="selectArtworkType(null)"
+          >
+            Tất cả
+          </button>
+          <button
+            *ngFor="let opt of artworkTypeOptions"
+            type="button"
+            class="artwork-type-pill"
+            [class.artwork-type-pill--active]="selectedArtworkType() === opt.value"
+            (click)="selectArtworkType(opt.value)"
+          >
+            {{ opt.label }}
+          </button>
+        </div>
+      </div>
+
       <p *ngIf="categoriesLoadError()" class="category-filter-msg category-filter-msg--warn" role="status">
         {{ categoriesLoadError() }} Bộ lọc danh mục có thể không dùng được.
       </p>
@@ -159,6 +182,9 @@
             <span>sản phẩm</span>
             <span *ngIf="selectedCategoryLabel() as label" class="pagination-filter-note">
               · {{ label }}
+            </span>
+            <span *ngIf="artworkTypeLabel() as tlabel" class="pagination-filter-note">
+              · {{ tlabel }}
             </span>
           </div>
 

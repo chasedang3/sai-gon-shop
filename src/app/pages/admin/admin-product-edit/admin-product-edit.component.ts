@@ -9,7 +9,7 @@ import { ProductService } from '../../../core/services/product.service';
 import { Product } from '../../../core/models/product.model';
 
 type PageState = 'loading' | 'ready' | 'saving' | 'success' | 'error';
-type ProductType = 'canvas' | 'oil';
+type ProductType = 'Canvas' | 'SonDau' | 'TrangGuong';
 
 function hasAtLeastOneCategory(value: unknown): boolean {
   return Array.isArray(value) && value.length > 0;
@@ -44,7 +44,7 @@ export class AdminProductEditComponent {
     description: ['', [Validators.required]],
     price: this.fb.nonNullable.control(0, [Validators.required, Validators.min(1)]),
     imageUrl: ['', [Validators.required]],
-    type: this.fb.nonNullable.control<ProductType>('canvas', [Validators.required]),
+    type: this.fb.nonNullable.control<ProductType>('Canvas', [Validators.required]),
     isAvailable: this.fb.nonNullable.control(true),
     categoryIds: this.fb.nonNullable.control<string[]>([], [
       control => (hasAtLeastOneCategory(control.value) ? null : { minSelected: true })
@@ -106,7 +106,7 @@ export class AdminProductEditComponent {
           description: entity.description,
           price: entity.price,
           imageUrl: entity.imageUrl,
-          type: entity.type === 'oil' ? 'oil' : 'canvas',
+          type: entity.type === 'SonDau' ? 'SonDau' : entity.type === 'TrangGuong' ? 'TrangGuong' : 'Canvas',
           isAvailable: entity.isAvailable,
           categoryIds: [...entity.categoryIds]
         });

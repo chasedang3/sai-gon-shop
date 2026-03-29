@@ -24,6 +24,27 @@ function categoryFilterKey(q: ParamMap): string {
   return parseCategoryIdFromQuery(q) ?? '';
 }
 
+/** Giá trị gửi API — khớp backend. */
+export const ARTWORK_TYPE_OPTIONS = [
+  { value: 'SonDau', label: 'Sơn dầu' },
+  { value: 'TrangGuong', label: 'Tranh gương' },
+  { value: 'Canvas', label: 'Canvas' },
+] as const;
+
+const ALLOWED_ARTWORK_TYPES: Set<string> = new Set<string>(
+  ARTWORK_TYPE_OPTIONS.map((o) => o.value),
+);
+
+function parseArtworkTypeFromQuery(q: ParamMap): string | null {
+  const raw = q.get('type')?.trim();
+  if (!raw || !ALLOWED_ARTWORK_TYPES.has(raw)) return null;
+  return raw;
+}
+
+function artworkTypeFilterKey(q: ParamMap): string {
+  return parseArtworkTypeFromQuery(q) ?? '';
+}
+
 @Component({
   standalone: true,
   selector: 'app-product-list',
@@ -48,6 +69,10 @@ export class ProductListComponent {
   currentPage = signal(1);
   /** Đang lọc theo một danh mục, hoặc null = tất cả. */
   selectedCategoryId = signal<string | null>(null);
+  /** SonDau | TrangGuong | Canvas — null = tất cả loại. */
+  selectedArtworkType = signal<string | null>(null);
+
+  readonly artworkTypeOptions = ARTWORK_TYPE_OPTIONS;
 
   allCategories = signal<Category[]>([]);
   categoriesLoadError = signal<string | null>(null);
@@ -86,13 +111,16 @@ export class ProductListComponent {
         distinctUntilChanged(
           (a, b) =>
             (a.get('page') || '1') === (b.get('page') || '1') &&
-            categoryFilterKey(a) === categoryFilterKey(b),
+            categoryFilterKey(a) === categoryFilterKey(b) &&
+            artworkTypeFilterKey(a) === artworkTypeFilterKey(b),
         ),
         switchMap((q) => {
           const page = Math.max(1, parseInt(q.get('page') || '1', 10) || 1);
           const categoryId = parseCategoryIdFromQuery(q);
+          const artworkType = parseArtworkTypeFromQuery(q);
           this.currentPage.set(page);
           this.selectedCategoryId.set(categoryId);
+          this.selectedArtworkType.set(artworkType);
           this.products.set([]);
           this.totalCount.set(0);
           this.loading.set(true);
@@ -103,6 +131,7 @@ export class ProductListComponent {
               pageSize: this.pageSize,
               all: false,
               categoryId: categoryId ?? undefined,
+              type: artworkType ?? undefined,
             })
             .pipe(finalize(() => this.loading.set(false)));
         }),
@@ -163,6 +192,22 @@ export class ProductListComponent {
 
   clearCategoryFilter(): void {
     this.selectCategory(null);
+  }
+
+  selectArtworkType(value: string | null): void {
+    const v = value?.trim() ?? null;
+    const normalized = v && ALLOWED_ARTWORK_TYPES.has(v) ? v : null;
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { type: normalized, page: 1 },
+      queryParamsHandling: 'merge',
+    });
+  }
+
+  artworkTypeLabel(): string | null {
+    const t = this.selectedArtworkType();
+    if (!t) return null;
+    return ARTWORK_TYPE_OPTIONS.find((o) => o.value === t)?.label ?? t;
   }
 
   goToPage(page: number): void {

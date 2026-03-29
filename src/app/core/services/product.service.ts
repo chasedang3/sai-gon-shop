@@ -67,6 +67,8 @@ export class ProductService {
     all?: boolean;
     /** Một danh mục: GET ...&categoryId= — bỏ qua để lấy toàn bộ (theo API). */
     categoryId?: string | null;
+    /** Loại tranh: SonDau | TrangGuong | Canvas — GET ...&type= */
+    type?: string | null;
   }): Observable<PagedProducts> {
     let httpParams = new HttpParams()
       .set('page', String(params.page))
@@ -76,6 +78,11 @@ export class ProductService {
     const cat = params.categoryId?.trim();
     if (cat) {
       httpParams = httpParams.set('categoryId', cat);
+    }
+
+    const typ = params.type?.trim();
+    if (typ) {
+      httpParams = httpParams.set('type', typ);
     }
 
     return this.http.get<unknown>(this.artworksApiUrl, { params: httpParams }).pipe(
