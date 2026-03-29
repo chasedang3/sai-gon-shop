@@ -53,9 +53,48 @@
                                 <a class="nav-link p-0 dropdown-toggle text-center " data-bs-toggle="dropdown" href="#"
                                     role="button" aria-expanded="false">Sản phẩm khác</a>
                                 <ul class="dropdown-menu dropdown-menu-end animate slide mt-3 border-0 shadow">
-                                    <li><a href="" class="dropdown-item ">Tranh Sơn Dầu </a></li>
-                                    <li><a href="" class="dropdown-item">Tranh Canvas</a></li>
-                                    <li><a href="" class="dropdown-item ">Tranh Tráng Gương</a></li>
+                                    <li>
+                                        <a
+                                            routerLink="/products"
+                                            [queryParams]="{
+                                                type: 'SonDau',
+                                                page: 1,
+                                                category: null,
+                                                categories: null
+                                            }"
+                                            class="dropdown-item"
+                                        >
+                                            Tranh Sơn Dầu
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a
+                                            routerLink="/products"
+                                            [queryParams]="{
+                                                type: 'Canvas',
+                                                page: 1,
+                                                category: null,
+                                                categories: null
+                                            }"
+                                            class="dropdown-item"
+                                        >
+                                            Tranh Canvas
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a
+                                            routerLink="/products"
+                                            [queryParams]="{
+                                                type: 'TrangGuong',
+                                                page: 1,
+                                                category: null,
+                                                categories: null
+                                            }"
+                                            class="dropdown-item"
+                                        >
+                                            Tranh Tráng Gương
+                                        </a>
+                                    </li>
                                 </ul>
                             </li>
                         </ul>
