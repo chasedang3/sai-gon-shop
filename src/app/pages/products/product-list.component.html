@@ -1,103 +1,200 @@
 <section class="featured-section product-list-section">
-  <div class="featured-header">
-    <h2 class="featured-title">
-      Danh Sách Sản Phẩm
-    </h2>
-    <p class="featured-subtitle">
-      Quản lý bộ sưu tập tranh và sản phẩm decor
-    </p>
-  </div>
+  <div class="product-list-shell">
+    <div class="featured-header">
+      <h2 class="featured-title">
+        Danh Sách Sản Phẩm
+      </h2>
+      <p class="featured-subtitle">
+        Quản lý bộ sưu tập tranh và sản phẩm decor
+      </p>
 
-  <p *ngIf="error()" class="text-red-600 mb-4" role="alert">
-    {{ error() }}
-  </p>
-
-  <div *ngIf="loading()" class="py-12 text-center text-gray-600">
-    Đang tải sản phẩm…
-  </div>
-
-  <div *ngIf="!loading() && !error() && products().length === 0" class="py-12 text-center text-gray-600">
-    Chưa có sản phẩm nào.
-  </div>
-
-  <div class="featured-grid" *ngIf="!loading() && !error() && products().length > 0">
-    <a
-      *ngFor="let product of products(); trackBy: trackByProductId"
-      class="card-link"
-      [routerLink]="['/products', product.id]"
-    >
-      <div class="card">
-        <div class="card-image">
-          <img
-            [src]="product.imageUrl"
-            alt="{{ product.title }}"
-            width="400"
-            height="500"
-            loading="lazy"
-          />
-        </div>
-        <div class="card-body">
-          <h3 class="card-title">
-            {{ product.title }}
-          </h3>
-          <p class="card-price">
-            {{ product.price | currency : 'VND' : 'symbol' : '1.0-0' }}
-          </p>
-        </div>
-      </div>
-    </a>
-  </div>
-
-  <div
-    *ngIf="!loading() && !error() && totalCount() > pageSize"
-    class="pagination"
-  >
-    <div class="pagination-info">
-      <span>Hiển thị</span>
-      <span class="font-medium">
-        {{ totalCount() === 0 ? 0 : (currentPage() - 1) * pageSize + 1 }}
-      </span>
-      <span>-</span>
-      <span class="font-medium">
-        {{ Math.min(currentPage() * pageSize, totalCount()) }}
-      </span>
-      <span>trên</span>
-      <span class="font-medium">
-        {{ totalCount() }}
-      </span>
-      <span>sản phẩm</span>
+      <p *ngIf="categoriesLoadError()" class="category-filter-msg category-filter-msg--warn" role="status">
+        {{ categoriesLoadError() }} Bộ lọc danh mục có thể không dùng được.
+      </p>
     </div>
 
-    <div class="pagination-controls">
-      <button
-        type="button"
-        class="pagination-button"
-        [class.pagination-button--disabled]="currentPage() === 1"
-        (click)="previousPage()"
-        [disabled]="currentPage() === 1"
-      >
-        Trước
-      </button>
+    <p *ngIf="error()" class="product-list-alert" role="alert">
+      {{ error() }}
+    </p>
 
-      <button
-        *ngFor="let page of totalPagesArray(); trackBy: trackByPage"
-        type="button"
-        class="pagination-page"
-        [class.pagination-page--active]="currentPage() === page"
-        (click)="goToPage(page)"
-      >
-        {{ page }}
-      </button>
+    <div class="product-list-layout">
+      <aside class="product-list-sidebar">
+        <div class="category-filter">
+          <button
+            type="button"
+            class="category-filter-mobile-toggle md:hidden"
+            (click)="toggleFilterPanel()"
+            [attr.aria-expanded]="filterPanelOpen()"
+          >
+            Danh mục
+            <span class="category-filter-hint" *ngIf="selectedCategoryId()">
+              · {{ selectedCategoryLabel() }}
+            </span>
+          </button>
 
-      <button
-        type="button"
-        class="pagination-button"
-        [class.pagination-button--disabled]="currentPage() === totalPages()"
-        (click)="nextPage()"
-        [disabled]="currentPage() === totalPages()"
-      >
-        Sau
-      </button>
+          <div
+            class="category-filter-panel"
+            [class.category-filter-panel--open]="filterPanelOpen()"
+          >
+            <div class="category-filter-panel-inner">
+              <h3 class="category-filter-heading">Lọc theo danh mục</h3>
+              <p class="category-filter-help">
+                Chọn một danh mục hoặc <strong>Tất cả</strong> để xem toàn bộ sản phẩm.
+              </p>
+
+              <div class="category-filter-toolbar">
+                <label class="category-filter-search-label" for="category-search-input">Tìm nhanh</label>
+                <input
+                  id="category-search-input"
+                  type="search"
+                  class="category-filter-search"
+                  placeholder="Gõ tên danh mục…"
+                  autocomplete="off"
+                  [value]="categorySearch()"
+                  (input)="onCategorySearch($event)"
+                />
+                <button
+                  *ngIf="selectedCategoryId()"
+                  type="button"
+                  class="category-filter-clear"
+                  (click)="clearCategoryFilter()"
+                >
+                  Đặt lại
+                </button>
+              </div>
+
+              <div class="category-radiolist" role="radiogroup" aria-label="Danh mục">
+                <label class="category-radio-item">
+                  <input
+                    type="radio"
+                    name="shop-product-category"
+                    [checked]="!selectedCategoryId()"
+                    (change)="selectCategory(null)"
+                  />
+                  <span class="category-radio-label">Tất cả sản phẩm</span>
+                </label>
+                <label
+                  *ngFor="let c of filteredCategories(); trackBy: trackByCategoryId"
+                  class="category-radio-item"
+                >
+                  <input
+                    type="radio"
+                    name="shop-product-category"
+                    [checked]="selectedCategoryId() === c.id"
+                    (change)="selectCategory(c.id)"
+                  />
+                  <span class="category-radio-label">{{ c.name }}</span>
+                </label>
+                <p *ngIf="!filteredCategories().length" class="category-filter-empty">
+                  Không có danh mục nào khớp.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <div class="product-list-main">
+        <div *ngIf="loading()" class="product-list-loading">
+          Đang tải sản phẩm…
+        </div>
+
+        <div
+          *ngIf="!loading() && !error() && products().length === 0"
+          class="product-list-empty"
+        >
+          <ng-container *ngIf="selectedCategoryId(); else emptyAll">
+            Không có sản phẩm nào trong danh mục này.
+          </ng-container>
+          <ng-template #emptyAll>
+            Chưa có sản phẩm nào.
+          </ng-template>
+        </div>
+
+        <div class="featured-grid" *ngIf="!loading() && !error() && products().length > 0">
+          <a
+            *ngFor="let product of products(); trackBy: trackByProductId"
+            class="card-link"
+            [routerLink]="['/products', product.id]"
+          >
+            <div class="card">
+              <div class="card-image">
+                <img
+                  [src]="product.imageUrl"
+                  alt="{{ product.title }}"
+                  width="400"
+                  height="500"
+                  loading="lazy"
+                />
+              </div>
+              <div class="card-body">
+                <h3 class="card-title">
+                  {{ product.title }}
+                </h3>
+                <p class="card-price">
+                  {{ product.price | currency : 'VND' : 'symbol' : '1.0-0' }}
+                </p>
+              </div>
+            </div>
+          </a>
+        </div>
+
+        <div
+          *ngIf="!loading() && !error() && totalCount() > pageSize"
+          class="pagination"
+        >
+          <div class="pagination-info">
+            <span>Hiển thị</span>
+            <span class="font-medium">
+              {{ totalCount() === 0 ? 0 : (currentPage() - 1) * pageSize + 1 }}
+            </span>
+            <span>-</span>
+            <span class="font-medium">
+              {{ Math.min(currentPage() * pageSize, totalCount()) }}
+            </span>
+            <span>trên</span>
+            <span class="font-medium">
+              {{ totalCount() }}
+            </span>
+            <span>sản phẩm</span>
+            <span *ngIf="selectedCategoryLabel() as label" class="pagination-filter-note">
+              · {{ label }}
+            </span>
+          </div>
+
+          <div class="pagination-controls">
+            <button
+              type="button"
+              class="pagination-button"
+              [class.pagination-button--disabled]="currentPage() === 1"
+              (click)="previousPage()"
+              [disabled]="currentPage() === 1"
+            >
+              Trước
+            </button>
+
+            <button
+              *ngFor="let page of totalPagesArray(); trackBy: trackByPage"
+              type="button"
+              class="pagination-page"
+              [class.pagination-page--active]="currentPage() === page"
+              (click)="goToPage(page)"
+            >
+              {{ page }}
+            </button>
+
+            <button
+              type="button"
+              class="pagination-button"
+              [class.pagination-button--disabled]="currentPage() === totalPages()"
+              (click)="nextPage()"
+              [disabled]="currentPage() === totalPages()"
+            >
+              Sau
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>

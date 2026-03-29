@@ -55,121 +55,39 @@
         </p>
     </div>
 
-    <!-- Grid -->
-    <div class="featured-grid">
-        <!-- Product item -->
-        <div class="card">
-            <div class="card-image">
-                <img src="assets/images/PG9108.jpg" alt="Tranh Sơn Dầu" />
-            </div>
-            <div class="card-body">
-                <h3 class="card-title">
-                    Tranh Sơn Dầu Hoàng Hôn
-                </h3>
-                <p class="card-price">
-                    2.500.000₫
-                </p>
-            </div>
-        </div>
+    <p *ngIf="featuredError()" class="text-center text-danger small px-3" role="alert">
+        {{ featuredError() }}
+    </p>
 
-        <div class="card">
-            <div class="card-image">
-                <img src="assets/images/PG9108.jpg bnnnn" alt="Tranh Tối Giản" />
-            </div>
-            <div class="card-body">
-                <h3 class="card-title">
-                    Tranh Tối Giản Hình Khối
-                </h3>
-                <p class="card-price">
-                    1.800.000₫
-                </p>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-image">
-                <img src="assets/images/PG9108.jpg" alt="Tranh Tối Giản" />
-            </div>
-            <div class="card-body">
-                <h3 class="card-title">
-                    Tranh Tối Giản Hình Khối
-                </h3>
-                <p class="card-price">
-                    1.800.000₫
-                </p>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-image">
-                <img src="assets/images/PG9108.jpg" alt="Tranh Tối Giản" />
-            </div>
-            <div class="card-body">
-                <h3 class="card-title">
-                    Tranh Tối Giản Hình Khối
-                </h3>
-                <p class="card-price">
-                    1.800.000₫
-                </p>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-image">
-                <img src="assets/images/PG9108.jpg" alt="Tranh Tối Giản" />
-            </div>
-            <div class="card-body">
-                <h3 class="card-title">
-                    Tranh Tối Giản Hình Khối
-                </h3>
-                <p class="card-price">
-                    1.800.000₫
-                </p>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-image">
-                <img src="assets/images/PG9108.jpg" alt="Tranh Tối Giản" />
-            </div>
-            <div class="card-body">
-                <h3 class="card-title">
-                    Tranh Tối Giản Hình Khối
-                </h3>
-                <p class="card-price">
-                    1.800.000₫
-                </p>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-image">
-                <img src="assets/images/PG9108.jpg" alt="Tranh Tối Giản" />
-            </div>
-            <div class="card-body">
-                <h3 class="card-title">
-                    Tranh Tối Giản Hình Khối
-                </h3>
-                <p class="card-price">
-                    1.800.000₫
-                </p>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-image">
-                <img src="assets/images/PG9108.jpg" alt="Tranh Tối Giản" />
-            </div>
-            <div class="card-body">
-                <h3 class="card-title">
-                    Tranh Tối Giản Hình Khối
-                </h3>
-                <p class="card-price">
-                    1.800.000₫
-                </p>
-            </div>
-        </div>
+    <div *ngIf="featuredLoading()" class="text-center text-muted py-5">
+        Đang tải sản phẩm nổi bật…
     </div>
+
+    <div class="featured-grid" *ngIf="!featuredLoading() && !featuredError()">
+        <a
+            *ngFor="let product of featuredProducts(); trackBy: trackFeaturedId"
+            [routerLink]="['/products', product.id]"
+            class="featured-product-link"
+        >
+            <div class="card">
+                <div class="card-image">
+                    <img [src]="product.imageUrl" [alt]="product.title" loading="lazy" />
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title">
+                        {{ product.title }}
+                    </h3>
+                    <p class="card-price">
+                        {{ product.price | currency : 'VND' : 'symbol' : '1.0-0' }}
+                    </p>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <p *ngIf="!featuredLoading() && !featuredError() && featuredProducts().length === 0" class="text-center text-muted py-4">
+        Chưa có sản phẩm để hiển thị.
+    </p>
 
     <!-- View more -->
     <div class="featured-view-more">

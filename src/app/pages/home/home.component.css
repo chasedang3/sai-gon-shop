@@ -30,6 +30,19 @@
     color: #6b7280;
 }
 
+.featured-product-link {
+    display: block;
+    height: 100%;
+    color: inherit;
+    text-decoration: none;
+}
+
+.featured-product-link:focus-visible {
+    outline: 2px solid #c58a4a;
+    outline-offset: 4px;
+    border-radius: 12px;
+}
+
 .featured-grid {
     display: grid;
     grid-template-columns: repeat(1, minmax(0, 1fr));

@@ -166,6 +166,34 @@
   gap: 1.25rem;
 }
 
+.product-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 0.65rem;
+  margin-bottom: 0.35rem;
+}
+
+.product-category-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #047857;
+  background: #ecfdf5;
+  border: 1px solid rgba(4, 120, 87, 0.35);
+  text-decoration: none;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.product-category-link:hover {
+  background: #d1fae5;
+  color: #064e3b;
+}
+
 .product-meta {
   display: flex;
   flex-wrap: wrap;

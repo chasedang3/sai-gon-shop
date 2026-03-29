@@ -61,11 +61,22 @@ export class ProductService {
    * Paged shop list: GET /Artworks?page=&pageSize=&all=
    * Expects `items` + `totalCount` (camelCase or PascalCase), or a bare array (total falls back to length).
    */
-  getProductsPage(params: { page: number; pageSize: number; all?: boolean }): Observable<PagedProducts> {
-    const httpParams = new HttpParams()
+  getProductsPage(params: {
+    page: number;
+    pageSize: number;
+    all?: boolean;
+    /** Một danh mục: GET ...&categoryId= — bỏ qua để lấy toàn bộ (theo API). */
+    categoryId?: string | null;
+  }): Observable<PagedProducts> {
+    let httpParams = new HttpParams()
       .set('page', String(params.page))
       .set('pageSize', String(params.pageSize))
       .set('all', String(params.all ?? false));
+
+    const cat = params.categoryId?.trim();
+    if (cat) {
+      httpParams = httpParams.set('categoryId', cat);
+    }
 
     return this.http.get<unknown>(this.artworksApiUrl, { params: httpParams }).pipe(
       map((res) => this.parsePagedArtworks(res)),

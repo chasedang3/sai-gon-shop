@@ -1,6 +1,6 @@
 import { CommonModule, CurrencyPipe, DOCUMENT } from '@angular/common';
 import { Component, DestroyRef, HostListener, inject, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { filter, map, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Product } from '../../core/models/product.model';
@@ -9,7 +9,7 @@ import { ProductService } from '../../core/services/product.service';
 @Component({
   standalone: true,
   selector: 'app-product-detail',
-  imports: [CommonModule, CurrencyPipe],
+  imports: [CommonModule, CurrencyPipe, RouterLink],
   templateUrl: './product-detail.component.html',
   styleUrl: './product-detail.component.css',
 })

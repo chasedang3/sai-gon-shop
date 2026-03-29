@@ -11,10 +11,28 @@ export class CategoryService {
   constructor(private readonly http: HttpClient) {}
 
   getCategories(): Observable<Category[]> {
-    return this.http.get<Category[] | { items: Category[] }>(this.apiUrl).pipe(
-      map((res) => (Array.isArray(res) ? res : res.items)),
+    return this.http.get<unknown>(this.apiUrl).pipe(
+      map((res) => {
+        const raw = Array.isArray(res) ? res : (res as { items?: unknown[] })?.items;
+        const rows = Array.isArray(raw) ? raw : [];
+        return rows.map((row) => this.normalizeCategory(row));
+      }),
       catchError((err) => this.handleError(err, 'Không thể tải danh sách danh mục.'))
     );
+  }
+
+  private normalizeCategory(row: unknown): Category {
+    const o = row as Record<string, unknown>;
+    return {
+      id: String(o['id'] ?? o['Id'] ?? ''),
+      name: String(o['name'] ?? o['Name'] ?? ''),
+      description:
+        typeof o['description'] === 'string'
+          ? o['description']
+          : typeof o['Description'] === 'string'
+            ? o['Description']
+            : undefined
+    };
   }
 
   createCategory(payload: Omit<Category, 'id'>): Observable<Category> {

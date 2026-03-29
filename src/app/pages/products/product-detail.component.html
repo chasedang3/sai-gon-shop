@@ -36,13 +36,15 @@
             <span class="product-id">Mã: {{ p.id }}</span>
           </div>
 
-          <div *ngIf="p.categories?.length" class="product-categories mb-2">
-            <span
+          <div *ngIf="p.categories?.length" class="product-categories">
+            <a
               *ngFor="let c of p.categories"
-              class="inline-block mr-2 text-sm text-gray-600"
+              [routerLink]="['/products']"
+              [queryParams]="{ category: c.id, page: 1, categories: null }"
+              class="product-category-link"
             >
               {{ c.name }}
-            </span>
+            </a>
           </div>
 
           <div class="product-title-block">
