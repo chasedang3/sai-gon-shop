@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { finalize, map, startWith } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { CategoryService } from '../../../core/categories/category.service';
@@ -11,7 +11,7 @@ type SubmitState = 'idle' | 'loading' | 'success' | 'error';
 @Component({
   selector: 'app-admin-category-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './admin-category-create.component.html',
   styleUrl: './admin-category-create.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

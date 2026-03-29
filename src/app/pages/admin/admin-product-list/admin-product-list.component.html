@@ -27,12 +27,16 @@
             {{ msg }}
           </div>
 
-          <div *ngIf="total() === 0" class="rounded-2xl border border-slate-200 bg-white p-8 text-center">
+          <div *ngIf="state() === 'loading' && totalCount() === 0" class="rounded-2xl border border-slate-200 bg-white p-8 text-center">
+            <div class="text-sm font-semibold text-slate-900">Đang tải danh sách…</div>
+          </div>
+
+          <div *ngIf="state() === 'idle' && totalCount() === 0" class="rounded-2xl border border-slate-200 bg-white p-8 text-center">
             <div class="text-sm font-semibold text-slate-900">Chưa có sản phẩm</div>
             <div class="mt-1 text-sm text-slate-600">Bấm “Tạo sản phẩm mới” để thêm tác phẩm đầu tiên.</div>
           </div>
 
-          <div *ngIf="total() > 0" class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+          <div *ngIf="totalCount() > 0" class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
             <div class="overflow-x-auto">
               <table class="min-w-full text-left text-sm">
                 <thead class="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-600">
@@ -49,7 +53,7 @@
 
                 <tbody class="divide-y divide-slate-200">
                   <tr
-                    *ngFor="let p of pagedProducts(); trackBy: trackByProductId"
+                    *ngFor="let p of products(); trackBy: trackByProductId"
                     class="admin-row hover:bg-slate-50/70"
                   >
                     <td class="px-4 py-3">
@@ -139,7 +143,7 @@
                 <span class="font-semibold text-slate-900">
                   {{ rangeEnd() }}
                 </span>
-                / <span class="font-semibold text-slate-900">{{ total() }}</span>
+                / <span class="font-semibold text-slate-900">{{ totalCount() }}</span>
               </div>
 
               <div class="flex items-center justify-between gap-2 sm:justify-end">

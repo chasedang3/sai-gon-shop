@@ -220,11 +220,15 @@ export class ProductService {
           ? o['totalCount']
           : typeof o['TotalCount'] === 'number'
             ? o['TotalCount']
-            : typeof o['total'] === 'number'
-              ? o['total']
-              : typeof o['Total'] === 'number'
-                ? o['Total']
-                : items.length;
+            : typeof o['totalItems'] === 'number'
+              ? o['totalItems']
+              : typeof o['TotalItems'] === 'number'
+                ? o['TotalItems']
+                : typeof o['total'] === 'number'
+                  ? o['total']
+                  : typeof o['Total'] === 'number'
+                    ? o['Total']
+                    : items.length;
 
       return { items, totalCount };
     }

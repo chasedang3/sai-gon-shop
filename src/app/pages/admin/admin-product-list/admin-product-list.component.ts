@@ -1,7 +1,8 @@
 import { NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { finalize } from 'rxjs';
+import { finalize, switchMap } from 'rxjs';
 import { CategoryService } from '../../../core/categories/category.service';
 import { ProductService } from '../../../core/services/product.service';
 import { Product } from '../../../core/models/product.model';
@@ -34,67 +35,92 @@ export class AdminProductListComponent {
     return map;
   });
 
+  /** Chỉ chứa đúng sản phẩm của trang hiện tại (theo API). */
   readonly products = signal<Product[]>([]);
+  /** Tổng số từ API (toàn bộ trang). */
+  readonly totalCount = signal(0);
 
-  // Pagination
   readonly pageSize = 12;
   readonly page = signal(1);
 
-  readonly total = computed(() => this.products().length);
-  readonly totalPages = computed(() => Math.max(1, Math.ceil(this.total() / this.pageSize)));
+  readonly totalPages = computed(() => Math.max(1, Math.ceil(this.totalCount() / this.pageSize)));
 
   readonly pages = computed(() => {
     const totalPages = this.totalPages();
     return Array.from({ length: totalPages }, (_, i) => i + 1);
   });
 
-  readonly pagedProducts = computed(() => {
-    const page = this.page();
-    const start = (page - 1) * this.pageSize;
-    return this.products().slice(start, start + this.pageSize);
-  });
+  readonly rangeStart = computed(() =>
+    this.totalCount() === 0 ? 0 : (this.page() - 1) * this.pageSize + 1,
+  );
+  readonly rangeEnd = computed(() =>
+    Math.min(this.page() * this.pageSize, this.totalCount()),
+  );
 
-  readonly rangeStart = computed(() => (this.total() === 0 ? 0 : (this.page() - 1) * this.pageSize + 1));
-  readonly rangeEnd = computed(() => Math.min(this.page() * this.pageSize, this.total()));
-
-  // Delete modal
   readonly deleteModalOpen = signal(false);
   readonly selectedToDelete = signal<Product | null>(null);
   readonly deletingId = signal<string | null>(null);
 
   constructor() {
     this.loadCategories();
-    this.load();
+
+    toObservable(this.page)
+      .pipe(
+        switchMap((page) => {
+          this.state.set('loading');
+          this.errorMessage.set(null);
+          return this.productService
+            .getProductsPage({ page, pageSize: this.pageSize, all: false })
+            .pipe(finalize(() => this.state.set('idle')));
+        }),
+        takeUntilDestroyed(),
+      )
+      .subscribe({
+        next: ({ items, totalCount }) => {
+          this.products.set(items ?? []);
+          this.totalCount.set(totalCount);
+          const maxPage = Math.max(1, Math.ceil(totalCount / this.pageSize));
+          if (this.page() > maxPage) {
+            this.page.set(maxPage);
+          }
+        },
+        error: (err: unknown) => {
+          this.products.set([]);
+          this.totalCount.set(0);
+          this.state.set('error');
+          this.errorMessage.set(err instanceof Error ? err.message : 'Không thể tải danh sách sản phẩm.');
+        },
+      });
   }
 
   private loadCategories(): void {
     this.categoryService.getCategories().subscribe({
       next: (items) => this.categories.set(items ?? []),
-      error: () => this.categories.set([])
+      error: () => this.categories.set([]),
     });
   }
 
-  private load(): void {
+  /** Đồng bộ lại danh sách trang hiện tại (sau xoá, v.v.). */
+  private reloadCurrentPageFromApi(): void {
+    const p = this.page();
     this.state.set('loading');
     this.errorMessage.set(null);
-
     this.productService
-      .getProducts({
-        page: 1,
-        pageSize: this.pageSize,
-        all: false
-      })
+      .getProductsPage({ page: p, pageSize: this.pageSize, all: false })
+      .pipe(finalize(() => this.state.set('idle')))
       .subscribe({
-      next: (items) => {
-        this.products.set(items ?? []);
-        this.state.set('idle');
-        this.setPage(1);
-      },
-      error: (err: unknown) => {
-        this.state.set('error');
-        this.errorMessage.set(err instanceof Error ? err.message : 'Không thể tải danh sách sản phẩm.');
-      }
-    });
+        next: ({ items, totalCount }) => {
+          this.products.set(items ?? []);
+          this.totalCount.set(totalCount);
+          const maxPage = Math.max(1, Math.ceil(totalCount / this.pageSize));
+          if (this.page() > maxPage) {
+            this.page.set(maxPage);
+          }
+        },
+        error: (err: unknown) => {
+          this.errorMessage.set(err instanceof Error ? err.message : 'Không thể tải lại danh sách.');
+        },
+      });
   }
 
   openDeleteModal(p: Product): void {
@@ -134,17 +160,13 @@ export class AdminProductListComponent {
       .pipe(finalize(() => this.deletingId.set(null)))
       .subscribe({
         next: () => {
-          this.products.update(list => list.filter(p => p.id !== target.id));
           this.deleteModalOpen.set(false);
           this.selectedToDelete.set(null);
-
-          // Keep current page in range after deletion
-          const nextTotalPages = Math.max(1, Math.ceil(this.products().length / this.pageSize));
-          if (this.page() > nextTotalPages) this.page.set(nextTotalPages);
+          this.reloadCurrentPageFromApi();
         },
         error: (err: unknown) => {
           this.errorMessage.set(err instanceof Error ? err.message : 'Xoá sản phẩm thất bại. Vui lòng thử lại.');
-        }
+        },
       });
   }
 
@@ -157,16 +179,19 @@ export class AdminProductListComponent {
   }
 
   formatVnd(price: number): string {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(price ?? 0);
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(
+      price ?? 0,
+    );
   }
 
   categoryLabels(ids: string[]): string[] {
     const map = this.categoryNameById();
-    return (ids ?? []).map(id => map.get(id) ?? 'Khác');
+    return (ids ?? []).map((id) => map.get(id) ?? 'Khác');
   }
 
   setPage(p: number): void {
-    const safe = Math.min(Math.max(1, p), this.totalPages());
+    const maxP = this.totalPages();
+    const safe = Math.min(Math.max(1, p), maxP);
     this.page.set(safe);
   }
 
@@ -178,4 +203,3 @@ export class AdminProductListComponent {
     this.setPage(this.page() + 1);
   }
 }
-
