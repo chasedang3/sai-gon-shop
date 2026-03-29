@@ -14,6 +14,11 @@ type ArtworkCategoryDto = {
   name?: string;
 };
 
+export interface PagedProducts {
+  items: Product[];
+  totalCount: number;
+}
+
 type ArtworkDto = Partial<Omit<Product, 'categoryIds'>> & {
   categories?: ArtworkCategoryDto[];
   categoryIds?: string[];
@@ -50,6 +55,24 @@ export class ProductService {
           this.handleError(err, 'Không thể tải danh sách sản phẩm.', 'Không tìm thấy API danh sách sản phẩm.')
         )
       );
+  }
+
+  /**
+   * Paged shop list: GET /Artworks?page=&pageSize=&all=
+   * Expects `items` + `totalCount` (camelCase or PascalCase), or a bare array (total falls back to length).
+   */
+  getProductsPage(params: { page: number; pageSize: number; all?: boolean }): Observable<PagedProducts> {
+    const httpParams = new HttpParams()
+      .set('page', String(params.page))
+      .set('pageSize', String(params.pageSize))
+      .set('all', String(params.all ?? false));
+
+    return this.http.get<unknown>(this.artworksApiUrl, { params: httpParams }).pipe(
+      map((res) => this.parsePagedArtworks(res)),
+      catchError((err) =>
+        this.handleError(err, 'Không thể tải danh sách sản phẩm.', 'Không tìm thấy API danh sách sản phẩm.')
+      )
+    );
   }
 
   getProductById(id: string): Observable<Product> {
@@ -159,6 +182,38 @@ export class ProductService {
     return backendMessage.trim() || fallbackMessage;
   }
 
+  private parsePagedArtworks(res: unknown): PagedProducts {
+    if (Array.isArray(res)) {
+      return {
+        items: res.map((item) => this.toProduct(item as ArtworkDto)),
+        totalCount: res.length
+      };
+    }
+
+    if (res && typeof res === 'object') {
+      const o = res as Record<string, unknown>;
+      const rawItems = o['items'] ?? o['Items'];
+      const items = Array.isArray(rawItems)
+        ? rawItems.map((item) => this.toProduct(item as ArtworkDto))
+        : [];
+
+      const totalCount =
+        typeof o['totalCount'] === 'number'
+          ? o['totalCount']
+          : typeof o['TotalCount'] === 'number'
+            ? o['TotalCount']
+            : typeof o['total'] === 'number'
+              ? o['total']
+              : typeof o['Total'] === 'number'
+                ? o['Total']
+                : items.length;
+
+      return { items, totalCount };
+    }
+
+    return { items: [], totalCount: 0 };
+  }
+
   private toProduct(entity: ArtworkDto): Product {
     const categories = Array.isArray(entity.categories) ? entity.categories : [];
     const categoryIdsFromCategories = categories
@@ -169,6 +224,13 @@ export class ProductService {
         ? entity.categoryIds
         : categoryIdsFromCategories;
 
+    const mappedCategories = categories
+      .map((c) => ({
+        id: typeof c?.id === 'string' ? c.id : '',
+        name: typeof c?.name === 'string' ? c.name : ''
+      }))
+      .filter((c) => c.id.length > 0);
+
     return {
       id: typeof entity.id === 'string' ? entity.id : '',
       title: typeof entity.title === 'string' ? entity.title : '',
@@ -177,7 +239,8 @@ export class ProductService {
       imageUrl: typeof entity.imageUrl === 'string' ? entity.imageUrl : '',
       type: typeof entity.type === 'string' ? entity.type : 'canvas',
       isAvailable: typeof entity.isAvailable === 'boolean' ? entity.isAvailable : true,
-      categoryIds
+      categoryIds,
+      categories: mappedCategories.length > 0 ? mappedCategories : undefined
     };
   }
 }

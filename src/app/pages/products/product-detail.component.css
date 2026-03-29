@@ -49,15 +49,115 @@
   box-shadow: 0 14px 40px rgba(15, 23, 42, 0.16);
 }
 
+.product-detail-image-zoom {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: zoom-in;
+  border-radius: inherit;
+}
+
+.product-detail-image-zoom:focus-visible {
+  outline: 2px solid #047857;
+  outline-offset: 2px;
+}
+
+.product-detail-zoom-hint {
+  position: absolute;
+  right: 0.65rem;
+  bottom: 0.65rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #f9fafb;
+  background: rgba(17, 24, 39, 0.72);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.product-detail-image-wrapper:hover .product-detail-zoom-hint,
+.product-detail-image-zoom:focus-visible + .product-detail-zoom-hint {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .product-detail-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.35s ease;
+  vertical-align: middle;
 }
 
 .product-detail-image-wrapper:hover .product-detail-image {
   transform: scale(1.03);
+}
+
+.image-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: min(4vw, 2rem);
+  background: rgba(15, 23, 42, 0.92);
+  cursor: zoom-out;
+  animation: image-lightbox-in 0.22s ease;
+}
+
+@keyframes image-lightbox-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.image-lightbox__close {
+  position: absolute;
+  top: min(1.25rem, 4vw);
+  right: min(1.25rem, 4vw);
+  z-index: 1;
+  width: 2.75rem;
+  height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 999px;
+  font-size: 1.75rem;
+  line-height: 1;
+  color: #f9fafb;
+  background: rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.image-lightbox__close:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.image-lightbox__img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  cursor: default;
+  border-radius: 8px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
 }
 
 .product-detail-info-col {

@@ -6,55 +6,39 @@
     <p class="featured-subtitle">
       Quản lý bộ sưu tập tranh và sản phẩm decor
     </p>
-
-    <div class="filter-bar mt-3">
-      <div class="filter-select md:hidden">
-        <select
-          class="filter-select-control"
-          (change)="setCategory(($any($event.target)).value)"
-          [value]="selectedCategory()"
-        >
-          <option
-            *ngFor="let category of categories"
-            [value]="category"
-          >
-            {{ category }}
-          </option>
-        </select>
-      </div>
-
-      <div class="filter-buttons hidden md:flex">
-        <button
-          *ngFor="let category of categories"
-          type="button"
-          (click)="setCategory(category)"
-          class="filter-button"
-          [class.filter-button--active]="selectedCategory() === category"
-        >
-          {{ category }}
-        </button>
-      </div>
-    </div>
   </div>
 
-  <div class="featured-grid">
+  <p *ngIf="error()" class="text-red-600 mb-4" role="alert">
+    {{ error() }}
+  </p>
+
+  <div *ngIf="loading()" class="py-12 text-center text-gray-600">
+    Đang tải sản phẩm…
+  </div>
+
+  <div *ngIf="!loading() && !error() && products().length === 0" class="py-12 text-center text-gray-600">
+    Chưa có sản phẩm nào.
+  </div>
+
+  <div class="featured-grid" *ngIf="!loading() && !error() && products().length > 0">
     <a
-      *ngFor="let product of paginatedProducts(); trackBy: trackByProductId"
+      *ngFor="let product of products(); trackBy: trackByProductId"
       class="card-link"
       [routerLink]="['/products', product.id]"
     >
       <div class="card">
         <div class="card-image">
           <img
-            [ngSrc]="product.imageUrl"
-            alt="{{ product.name }}"
+            [src]="product.imageUrl"
+            alt="{{ product.title }}"
             width="400"
             height="500"
+            loading="lazy"
           />
         </div>
         <div class="card-body">
           <h3 class="card-title">
-            {{ product.name }}
+            {{ product.title }}
           </h3>
           <p class="card-price">
             {{ product.price | currency : 'VND' : 'symbol' : '1.0-0' }}
@@ -65,21 +49,21 @@
   </div>
 
   <div
-    *ngIf="totalItems() > pageSize"
+    *ngIf="!loading() && !error() && totalCount() > pageSize"
     class="pagination"
   >
     <div class="pagination-info">
       <span>Hiển thị</span>
       <span class="font-medium">
-        {{ (currentPage() - 1) * pageSize + 1 }}
+        {{ totalCount() === 0 ? 0 : (currentPage() - 1) * pageSize + 1 }}
       </span>
       <span>-</span>
       <span class="font-medium">
-        {{ Math.min(currentPage() * pageSize, totalItems()) }}
+        {{ Math.min(currentPage() * pageSize, totalCount()) }}
       </span>
       <span>trên</span>
       <span class="font-medium">
-        {{ totalItems() }}
+        {{ totalCount() }}
       </span>
       <span>sản phẩm</span>
     </div>
@@ -117,4 +101,3 @@
     </div>
   </div>
 </section>
-

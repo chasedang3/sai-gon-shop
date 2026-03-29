@@ -1,3 +1,8 @@
+export interface ProductCategory {
+  id: string;
+  name: string;
+}
+
 export interface Product {
   id: string;
   title: string;
@@ -7,5 +12,7 @@ export interface Product {
   type: string;
   isAvailable: boolean;
   categoryIds: string[];
+  /** Present when API returns category navigation (e.g. Artworks list/detail). */
+  categories?: ProductCategory[];
 }
 

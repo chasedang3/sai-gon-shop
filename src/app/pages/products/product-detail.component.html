@@ -1,92 +1,142 @@
 <section class="product-detail-page">
   <div class="product-detail-container">
-    <div class="product-detail-layout">
-      <div class="product-detail-image-col">
-        <div class="product-detail-image-wrapper">
-          <img
-            [ngSrc]="imageUrlOrPlaceholder()"
-            [alt]="product().name"
-            width="900"
-            height="900"
-            class="product-detail-image"
-          />
-        </div>
-      </div>
+    <p *ngIf="loading()" class="py-12 text-center text-gray-600">
+      Đang tải sản phẩm…
+    </p>
 
-      <div class="product-detail-info-col">
-        <div class="product-meta">
-          <span class="product-badge">Sản phẩm nổi bật</span>
-          <span class="product-id">Mã: {{ product().id }}</span>
-        </div>
+    <p *ngIf="error() && !loading()" class="py-12 text-center text-red-600" role="alert">
+      {{ error() }}
+    </p>
 
-        <div class="product-title-block">
-          <h1 class="product-title">
-            {{ product().name }}
-          </h1>
-
-          <div class="product-price-row">
-            <span class="product-price">
-              {{ product().price | currency : 'VND' : 'symbol' : '1.0-0' }}
-            </span>
-            <span class="product-price-note">
-              Đã bao gồm khung treo cơ bản
-            </span>
+    <ng-container *ngIf="product() as p">
+      <div class="product-detail-layout">
+        <div class="product-detail-image-col">
+          <div class="product-detail-image-wrapper">
+            <button
+              type="button"
+              class="product-detail-image-zoom"
+              (click)="openImageLightbox()"
+              [attr.aria-label]="'Xem ảnh toàn màn hình: ' + p.title"
+            >
+              <img
+                [src]="imageUrlOrPlaceholder()"
+                [alt]="p.title"
+                width="900"
+                height="900"
+                class="product-detail-image"
+              />
+            </button>
+            <span class="product-detail-zoom-hint" aria-hidden="true">Nhấn để phóng to</span>
           </div>
         </div>
 
-        <p class="product-highlight">
-          Tranh decor hiện đại, phù hợp phòng khách, phòng ngủ và không gian làm việc cao cấp.
-        </p>
+        <div class="product-detail-info-col">
+          <div class="product-meta">
+            <span class="product-badge">Sản phẩm nổi bật</span>
+            <span class="product-id">Mã: {{ p.id }}</span>
+          </div>
 
-        <div class="product-description-card">
+          <div *ngIf="p.categories?.length" class="product-categories mb-2">
+            <span
+              *ngFor="let c of p.categories"
+              class="inline-block mr-2 text-sm text-gray-600"
+            >
+              {{ c.name }}
+            </span>
+          </div>
+
+          <div class="product-title-block">
+            <h1 class="product-title">
+              {{ p.title }}
+            </h1>
+
+            <div class="product-price-row">
+              <span class="product-price">
+                {{ p.price | currency : 'VND' : 'symbol' : '1.0-0' }}
+              </span>
+              <span class="product-price-note">
+                Đã bao gồm khung treo cơ bản
+              </span>
+            </div>
+          </div>
+
+          <p class="product-highlight">
+            Tranh decor hiện đại, phù hợp phòng khách, phòng ngủ và không gian làm việc cao cấp.
+          </p>
+
+          <div class="product-description-card">
+            <h2 class="section-title">
+              Mô tả sản phẩm
+            </h2>
+            <p class="product-description-text">
+              {{ p.description || 'Đang cập nhật mô tả.' }}
+            </p>
+          </div>
+
+          <div class="product-actions">
+            <button type="button" class="btn-primary-main">
+              Thêm vào giỏ
+            </button>
+            <button type="button" class="btn-outline-main">
+              Liên hệ tư vấn
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="install-card">
+        <div class="install-card-header">
           <h2 class="section-title">
-            Mô tả sản phẩm
+            Hướng dẫn lắp đặt
           </h2>
-          <p class="product-description-text">
-            {{ product().description }}
+          <p class="install-subtitle">
+            Đây là nội dung mẫu. Bạn có thể cập nhật chi tiết hướng dẫn lắp đặt phù hợp với từng sản phẩm.
           </p>
         </div>
 
-        <div class="product-actions">
-          <button type="button" class="btn-primary-main">
-            Thêm vào giỏ
-          </button>
-          <button type="button" class="btn-outline-main">
-            Liên hệ tư vấn
-          </button>
-        </div>
+        <ol class="install-steps">
+          <li>
+            <span class="step-label">Bước 1</span>
+            <span class="step-text">Chuẩn bị dụng cụ lắp đặt.</span>
+          </li>
+          <li>
+            <span class="step-label">Bước 2</span>
+            <span class="step-text">Xác định vị trí treo tranh phù hợp với không gian.</span>
+          </li>
+          <li>
+            <span class="step-label">Bước 3</span>
+            <span class="step-text">Cố định móc treo và lắp tranh lên tường.</span>
+          </li>
+          <li>
+            <span class="step-label">Bước 4</span>
+            <span class="step-text">Kiểm tra độ chắc chắn và điều chỉnh lại vị trí tranh.</span>
+          </li>
+        </ol>
       </div>
-    </div>
 
-    <div class="install-card">
-      <div class="install-card-header">
-        <h2 class="section-title">
-          Hướng dẫn lắp đặt
-        </h2>
-        <p class="install-subtitle">
-          Đây là nội dung mẫu. Bạn có thể cập nhật chi tiết hướng dẫn lắp đặt phù hợp với từng sản phẩm.
-        </p>
+      <div
+        *ngIf="imageLightboxOpen()"
+        class="image-lightbox"
+        role="dialog"
+        aria-modal="true"
+        [attr.aria-label]="'Ảnh: ' + p.title"
+        (click)="closeImageLightbox()"
+      >
+        <button
+          type="button"
+          class="image-lightbox__close"
+          (click)="closeImageLightbox(); $event.stopPropagation()"
+          aria-label="Đóng"
+        >
+          ×
+        </button>
+        <img
+          [src]="imageUrlOrPlaceholder()"
+          [alt]="p.title"
+          class="image-lightbox__img"
+          (click)="$event.stopPropagation()"
+        />
       </div>
-
-      <ol class="install-steps">
-        <li>
-          <span class="step-label">Bước 1</span>
-          <span class="step-text">Chuẩn bị dụng cụ lắp đặt.</span>
-        </li>
-        <li>
-          <span class="step-label">Bước 2</span>
-          <span class="step-text">Xác định vị trí treo tranh phù hợp với không gian.</span>
-        </li>
-        <li>
-          <span class="step-label">Bước 3</span>
-          <span class="step-text">Cố định móc treo và lắp tranh lên tường.</span>
-        </li>
-        <li>
-          <span class="step-label">Bước 4</span>
-          <span class="step-text">Kiểm tra độ chắc chắn và điều chỉnh lại vị trí tranh.</span>
-        </li>
-      </ol>
-    </div>
+    </ng-container>
   </div>
 </section>
-
