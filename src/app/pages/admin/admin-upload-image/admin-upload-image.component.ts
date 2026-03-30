@@ -1,6 +1,7 @@
 import { NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLinkWithHref } from '@angular/router';
 import { finalize } from 'rxjs';
 import { UploadService } from '../../../core/services/upload.service';
 
@@ -9,7 +10,7 @@ type UploadState = 'idle' | 'loading' | 'success' | 'error';
 @Component({
   selector: 'app-admin-upload-image',
   standalone: true,
-  imports: [NgIf, ReactiveFormsModule],
+  imports: [NgIf, ReactiveFormsModule, RouterLinkWithHref],
   templateUrl: './admin-upload-image.component.html',
   styleUrl: './admin-upload-image.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush

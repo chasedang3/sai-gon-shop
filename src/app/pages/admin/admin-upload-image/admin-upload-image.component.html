@@ -92,6 +92,12 @@
               >
                 Copy link ảnh
               </button>
+              <a
+                [routerLink]="['/admin/products/create']"
+                class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-900/20"
+              >
+                Chuyển sang trang tạo sản phẩm
+              </a>
 
               <p *ngIf="copiedMessage()" class="text-sm text-emerald-700">
                 {{ copiedMessage() }}

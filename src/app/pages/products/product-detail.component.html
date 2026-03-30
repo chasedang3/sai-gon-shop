@@ -66,15 +66,6 @@
             Tranh decor hiện đại, phù hợp phòng khách, phòng ngủ và không gian làm việc cao cấp.
           </p>
 
-          <div class="product-description-card">
-            <h2 class="section-title">
-              Mô tả sản phẩm
-            </h2>
-            <p class="product-description-text">
-              {{ p.description || 'Đang cập nhật mô tả.' }}
-            </p>
-          </div>
-
           <div class="product-actions">
             <button type="button" class="btn-primary-main">
               Thêm vào giỏ
@@ -84,6 +75,15 @@
             </button>
           </div>
         </div>
+      </div>
+      
+      <div class="product-description-card">
+        <h2 class="section-title">
+          Mô tả sản phẩm
+        </h2>
+        <p class="product-description-text">
+          {{ p.description || 'Đang cập nhật mô tả.' }}
+        </p>
       </div>
 
       <div class="install-card">
