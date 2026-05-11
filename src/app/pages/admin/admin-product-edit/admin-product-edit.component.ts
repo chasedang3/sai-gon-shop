@@ -1,5 +1,5 @@
 import { NgFor, NgIf } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
@@ -51,16 +51,24 @@ export class AdminProductEditComponent {
     ])
   });
 
-  readonly filteredCategories = computed(() => {
+  filteredCategories(): Category[] {
     const keyword = this.categorySearchTerm().trim().toLowerCase();
-    if (!keyword) return this.categories();
+    const selectedIds = new Set(this.form.controls.categoryIds.value);
 
-    return this.categories().filter(c => {
+    const filtered = this.categories().filter(c => {
+      if (!keyword) return true;
       const name = (c.name ?? '').toLowerCase();
       const id = c.id.toLowerCase();
       return name.includes(keyword) || id.includes(keyword);
     });
-  });
+
+    return [...filtered].sort((a, b) => {
+      const aSelected = selectedIds.has(a.id);
+      const bSelected = selectedIds.has(b.id);
+      if (aSelected === bSelected) return 0;
+      return aSelected ? -1 : 1;
+    });
+  }
 
   constructor() {
     const id = this.route.snapshot.paramMap.get('id');
