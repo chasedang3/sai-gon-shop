@@ -15,6 +15,15 @@ function hasAtLeastOneCategory(value: unknown): boolean {
   return Array.isArray(value) && value.length > 0;
 }
 
+function toProductType(value: unknown): ProductType | null {
+  if (typeof value !== 'string') return null;
+  const normalized = value.trim();
+  if (normalized === 'Canvas' || normalized === 'SonDau' || normalized === 'TrangGuong') {
+    return normalized;
+  }
+  return null;
+}
+
 @Component({
   selector: 'app-admin-product-edit',
   standalone: true,
@@ -109,12 +118,13 @@ export class AdminProductEditComponent {
 
     this.productService.getProductById(id).subscribe({
       next: entity => {
+        const resolvedType = toProductType(entity.type) ?? this.form.controls.type.value;
         this.form.patchValue({
           title: entity.title,
           description: entity.description,
           price: entity.price,
           imageUrl: entity.imageUrl,
-          type: entity.type === 'SonDau' ? 'SonDau' : entity.type === 'TrangGuong' ? 'TrangGuong' : 'Canvas',
+          type: resolvedType,
           isAvailable: entity.isAvailable,
           categoryIds: [...entity.categoryIds]
         });
