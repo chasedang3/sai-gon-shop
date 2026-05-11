@@ -9,6 +9,7 @@ import { Product } from '../../../core/models/product.model';
 import { Category } from '../../../core/categories/category.model';
 
 type LoadState = 'idle' | 'loading' | 'error';
+type PageToken = number | '...';
 
 @Component({
   selector: 'app-admin-product-list',
@@ -45,9 +46,24 @@ export class AdminProductListComponent {
 
   readonly totalPages = computed(() => Math.max(1, Math.ceil(this.totalCount() / this.pageSize)));
 
-  readonly pages = computed(() => {
+  readonly pages = computed<PageToken[]>(() => {
     const totalPages = this.totalPages();
-    return Array.from({ length: totalPages }, (_, i) => i + 1);
+    const current = this.page();
+
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    const tokens: PageToken[] = [1];
+    const start = Math.max(2, current - 1);
+    const end = Math.min(totalPages - 1, current + 1);
+
+    if (start > 2) tokens.push('...');
+    for (let p = start; p <= end; p += 1) tokens.push(p);
+    if (end < totalPages - 1) tokens.push('...');
+
+    tokens.push(totalPages);
+    return tokens;
   });
 
   readonly rangeStart = computed(() =>
@@ -138,8 +154,8 @@ export class AdminProductListComponent {
     return item;
   }
 
-  trackByNumber(_index: number, item: number): number {
-    return item;
+  trackByPageToken(index: number, item: PageToken): string {
+    return `${item}-${index}`;
   }
 
   closeDeleteModal(): void {

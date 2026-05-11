@@ -158,11 +158,12 @@
 
                 <div class="flex items-center gap-1">
                   <button
-                    *ngFor="let p of pages(); trackBy: trackByNumber"
+                    *ngFor="let p of pages(); trackBy: trackByPageToken"
                     type="button"
                     class="admin-page__pagenum"
                     [class.admin-page__pagenum--active]="p === page()"
-                    (click)="setPage(p)"
+                    [disabled]="p === '...'"
+                    (click)="p !== '...' && setPage(p)"
                   >
                     {{ p }}
                   </button>
