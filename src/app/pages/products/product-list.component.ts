@@ -31,6 +31,8 @@ export const ARTWORK_TYPE_OPTIONS = [
   { value: 'Canvas', label: 'Canvas' },
 ] as const;
 
+type PaginationItem = number | 'ellipsis';
+
 const ALLOWED_ARTWORK_TYPES: Set<string> = new Set<string>(
   ARTWORK_TYPE_OPTIONS.map((o) => o.value),
 );
@@ -58,7 +60,6 @@ export class ProductListComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
-  readonly Math = Math;
   readonly pageSize = 12;
 
   products = signal<Product[]>([]);
@@ -96,9 +97,31 @@ export class ProductListComponent {
 
   readonly totalPages = computed(() => Math.max(1, Math.ceil(this.totalCount() / this.pageSize)));
 
-  readonly totalPagesArray = computed(() =>
-    Array.from({ length: this.totalPages() }, (_, index) => index + 1),
-  );
+  readonly paginationItems = computed<PaginationItem[]>(() => {
+    const total = this.totalPages();
+    const current = this.currentPage();
+
+    if (total <= 7) {
+      return Array.from({ length: total }, (_, index) => index + 1);
+    }
+
+    const pages = new Set<number>([1, 2, current - 1, current, current + 1, total - 1, total]);
+    const sorted = Array.from(pages)
+      .filter((page) => page >= 1 && page <= total)
+      .sort((a, b) => a - b);
+
+    const result: PaginationItem[] = [];
+    for (let i = 0; i < sorted.length; i += 1) {
+      const page = sorted[i];
+      const previous = sorted[i - 1];
+      if (i > 0 && page - previous > 1) {
+        result.push('ellipsis');
+      }
+      result.push(page);
+    }
+
+    return result;
+  });
 
   constructor() {
     this.categoryService.getCategories().subscribe({
@@ -235,8 +258,8 @@ export class ProductListComponent {
     return product.id;
   }
 
-  trackByPage(_index: number, page: number): number {
-    return page;
+  trackByPaginationItem(index: number, item: PaginationItem): string {
+    return typeof item === 'number' ? `page-${item}` : `ellipsis-${index}`;
   }
 
   trackByCategoryId(_index: number, c: Category): string {

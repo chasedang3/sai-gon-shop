@@ -166,28 +166,6 @@
           *ngIf="!loading() && !error() && totalCount() > pageSize"
           class="pagination"
         >
-          <div class="pagination-info">
-            <span>Hiển thị</span>
-            <span class="font-medium">
-              {{ totalCount() === 0 ? 0 : (currentPage() - 1) * pageSize + 1 }}
-            </span>
-            <span>-</span>
-            <span class="font-medium">
-              {{ Math.min(currentPage() * pageSize, totalCount()) }}
-            </span>
-            <span>trên</span>
-            <span class="font-medium">
-              {{ totalCount() }}
-            </span>
-            <span>sản phẩm</span>
-            <span *ngIf="selectedCategoryLabel() as label" class="pagination-filter-note">
-              · {{ label }}
-            </span>
-            <span *ngIf="artworkTypeLabel() as tlabel" class="pagination-filter-note">
-              · {{ tlabel }}
-            </span>
-          </div>
-
           <div class="pagination-controls">
             <button
               type="button"
@@ -199,15 +177,22 @@
               Trước
             </button>
 
-            <button
-              *ngFor="let page of totalPagesArray(); trackBy: trackByPage"
-              type="button"
-              class="pagination-page"
-              [class.pagination-page--active]="currentPage() === page"
-              (click)="goToPage(page)"
-            >
-              {{ page }}
-            </button>
+            <div class="pagination-pages" role="group" aria-label="Danh sách trang">
+              <ng-container *ngFor="let item of paginationItems(); trackBy: trackByPaginationItem">
+                <button
+                  *ngIf="item !== 'ellipsis'; else ellipsisTpl"
+                  type="button"
+                  class="pagination-page"
+                  [class.pagination-page--active]="currentPage() === item"
+                  (click)="goToPage(item)"
+                >
+                  {{ item }}
+                </button>
+              </ng-container>
+              <ng-template #ellipsisTpl>
+                <span class="pagination-ellipsis" aria-hidden="true">...</span>
+              </ng-template>
+            </div>
 
             <button
               type="button"
