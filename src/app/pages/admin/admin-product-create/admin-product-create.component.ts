@@ -1,7 +1,7 @@
 import { NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { Category } from '../../../core/categories/category.model';
 import { CategoryService } from '../../../core/categories/category.service';
@@ -28,6 +28,7 @@ function hasAtLeastOneCategory(value: unknown): boolean {
 })
 export class AdminProductCreateComponent {
   private readonly fb = inject(FormBuilder);
+  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly categoryService = inject(CategoryService);
   private readonly productService = inject(ProductService);
@@ -64,6 +65,10 @@ export class AdminProductCreateComponent {
   });
 
   constructor() {
+    const imageUrlFromQuery = this.route.snapshot.queryParamMap.get('imageUrl')?.trim();
+    if (imageUrlFromQuery) {
+      this.form.controls.imageUrl.setValue(imageUrlFromQuery);
+    }
     this.loadCategories();
   }
 
