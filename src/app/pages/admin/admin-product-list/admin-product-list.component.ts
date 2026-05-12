@@ -1,7 +1,7 @@
 import { NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { finalize, switchMap } from 'rxjs';
 import { CategoryService } from '../../../core/categories/category.service';
 import { ProductService } from '../../../core/services/product.service';
@@ -14,7 +14,7 @@ type PageToken = number | '...';
 @Component({
   selector: 'app-admin-product-list',
   standalone: true,
-  imports: [NgIf, NgFor],
+  imports: [NgIf, NgFor, RouterLink],
   templateUrl: './admin-product-list.component.html',
   styleUrl: './admin-product-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -188,10 +188,6 @@ export class AdminProductListComponent {
 
   goToCreate(): void {
     void this.router.navigateByUrl('/admin/products/create');
-  }
-
-  goToEdit(p: Product): void {
-    void this.router.navigate(['/admin/products/edit', p.id]);
   }
 
   formatVnd(price: number): string {
