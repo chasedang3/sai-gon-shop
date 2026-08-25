@@ -6,7 +6,7 @@ import {
   HttpParams
 } from '@angular/common/http';
 import { Observable, catchError, map, throwError } from 'rxjs';
-import { environment } from '../../../../environment';
+import { environment } from '../../../environments/environment';
 import { Product } from '../models/product.model';
 
 type ArtworkCategoryDto = {
