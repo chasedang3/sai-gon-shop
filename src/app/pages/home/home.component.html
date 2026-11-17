@@ -7,7 +7,7 @@
                     <h2 class="fw-normal">Tranh Canvas & Tranh Sơn Dầu - Chạm Cảm Xúc, Nâng Tầm Không Gian</h2>
                     <p class="fw-normal">Tuyển chọn tranh treo tường nghệ thuật, phù hợp phòng khách, phòng ngủ, văn
                         phòng và quán cà phê.</p>
-                    <a href="" class="btn btn-arrow btn-primary mt-3">
+                    <a href="/products" class="btn btn-arrow btn-primary mt-3">
                         <span>Khám phá<svg width="18" height="18">
                                 <use xlink:href="#arrow-right"></use>
                             </svg></span>
@@ -101,83 +101,22 @@
     <div class="container-fluid padding-side" data-aos="fade-up">
         <h3 class="display-3 text-center fw-normal col-lg-4 offset-lg-4">Bộ sưu tập nổi bật</h3>
         <div class="row mt-5">
-            <div class="col-md-6 col-xl-4">
-                <div class="service mb-4 text-center rounded-4 p-5">
-                    <h4 class="display-6 fw-normal my-3">Tranh Sơn Dầu</h4>
+            <div class="col-md-6 col-xl-4" *ngFor="let item of featuredCollections; trackBy: trackCollection">
+                <a
+                    class="service collection-link mb-4 text-center rounded-4 p-5"
+                    [routerLink]="['/products']"
+                    [queryParams]="collectionQuery(item)"
+                >
+                    <h4 class="display-6 fw-normal my-3">{{ item.title }}</h4>
                     <div class="service-bg">
-                        <img src="assets/images/son-dau-bg.jpg" alt="Tranh Sơn Dầu" class="img-fluid rounded-4">
+                        <img [src]="item.image" [alt]="item.title" class="img-fluid rounded-4">
                     </div>
-                    <a href="/home" class="btn btn-arrow">
+                    <span class="btn btn-arrow">
                         <span class="text-decoration-underline">Khám phá<svg width="18" height="18">
                                 <use xlink:href="#arrow-right"></use>
                             </svg></span>
-                    </a>
-                </div>
-            </div>
-            <div class="col-md-6 col-xl-4">
-                <div class="service mb-4 text-center rounded-4 p-5">
-                    <h4 class="display-6 fw-normal my-3">Tranh Tối Giản</h4>
-                    <div class="service-bg">
-                        <img src="assets/images/toi-gian-bg.jpg" alt="Tranh Sơn Dầu" class="img-fluid rounded-4">
-                    </div>
-                    <a href="/home" class="btn btn-arrow">
-                        <span class="text-decoration-underline">Khám phá<svg width="18" height="18">
-                                <use xlink:href="#arrow-right"></use>
-                            </svg></span>
-                    </a>
-                </div>
-            </div>
-            <div class="col-md-6 col-xl-4">
-                <div class="service mb-4 text-center rounded-4 p-5">
-                    <h4 class="display-6 fw-normal my-3">Tranh Phong Cảnh</h4>
-                    <div class="service-bg">
-                        <img src="assets/images/phong-canh-bg.jpg" alt="Tranh Sơn Dầu" class="img-fluid rounded-4">
-                    </div>
-                    <a href="/home" class="btn btn-arrow">
-                        <span class="text-decoration-underline">Khám phá<svg width="18" height="18">
-                                <use xlink:href="#arrow-right"></use>
-                            </svg></span>
-                    </a>
-                </div>
-            </div>
-            <div class="col-md-6 col-xl-4">
-                <div class="service mb-4 text-center rounded-4 p-5">
-                    <h4 class="display-6 fw-normal my-3">Tranh Trừu Tượng</h4>
-                    <div class="service-bg">
-                        <img src="assets/images/truu-tuong-bg.jpg" alt="Tranh Sơn Dầu" class="img-fluid rounded-4">
-                    </div>
-                    <a href="/home" class="btn btn-arrow">
-                        <span class="text-decoration-underline">Khám phá<svg width="18" height="18">
-                                <use xlink:href="#arrow-right"></use>
-                            </svg></span>
-                    </a>
-                </div>
-            </div>
-            <div class="col-md-6 col-xl-4">
-                <div class="service mb-4 text-center rounded-4 p-5">
-                    <h4 class="display-6 fw-normal my-3">Tranh Hoa</h4>
-                    <div class="service-bg">
-                        <img src="assets/images/hoa-bg.jpg" alt="Tranh Sơn Dầu" class="img-fluid rounded-4">
-                    </div>
-                    <a href="/home" class="btn btn-arrow">
-                        <span class="text-decoration-underline">Khám phá<svg width="18" height="18">
-                                <use xlink:href="#arrow-right"></use>
-                            </svg></span>
-                    </a>
-                </div>
-            </div>
-            <div class="col-md-6 col-xl-4">
-                <div class="service mb-4 text-center rounded-4 p-5">
-                    <h4 class="display-6 fw-normal my-3">Tranh Động Vật</h4>
-                    <div class="service-bg">
-                        <img src="assets/images/dong-vat-bg.jpg" alt="Tranh Sơn Dầu" class="img-fluid rounded-4">
-                    </div>
-                    <a href="/home" class="btn btn-arrow">
-                        <span class="text-decoration-underline">Khám phá<svg width="18" height="18">
-                                <use xlink:href="#arrow-right"></use>
-                            </svg></span>
-                    </a>
-                </div>
+                    </span>
+                </a>
             </div>
         </div>
     </div>
