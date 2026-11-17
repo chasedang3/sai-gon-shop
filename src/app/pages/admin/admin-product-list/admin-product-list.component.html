@@ -10,28 +10,66 @@
         </div>
 
         <div class="flex items-center gap-2">
-          <button
-            type="button"
-            class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition
-              hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-900/20"
-            (click)="goToCreate()"
-          >
+          <button type="button" class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition
+              hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-900/20" (click)="goToCreate()">
             Tạo sản phẩm mới
           </button>
         </div>
       </div>
 
-      <div class="rounded-2xl bg-white/90 backdrop-blur shadow-[0_20px_60px_rgba(15,23,42,0.10)] ring-1 ring-slate-900/5">
+      <div
+        class="rounded-2xl bg-white/90 backdrop-blur shadow-[0_20px_60px_rgba(15,23,42,0.10)] ring-1 ring-slate-900/5">
         <div class="p-4 sm:p-6">
-          <div *ngIf="errorMessage() as msg" class="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          <!-- Thanh tìm kiếm -->
+          <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div class="relative w-full sm:max-w-sm">
+              <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="7"></circle>
+                <line x1="20" y1="20" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" inputmode="search" enterkeyhint="search" autocomplete="off"
+                aria-label="Tìm kiếm sản phẩm" placeholder="Tìm kiếm sản phẩm…"
+                class="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-10 text-sm text-slate-900 shadow-sm transition
+                  placeholder:text-slate-400 focus:border-slate-300 focus:outline-none focus:ring-4 focus:ring-slate-900/10" [value]="searchInput()" (input)="onSearchInput($event)" />
+              <button *ngIf="searchInput()" type="button" class="absolute right-2 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg text-slate-500 transition
+                  hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-4 focus:ring-slate-900/10"
+                aria-label="Xoá tìm kiếm" (click)="clearSearch()">
+                ✕
+              </button>
+            </div>
+
+            <p *ngIf="appliedSearch() && state() === 'idle'" class="text-sm text-slate-600">
+              Tìm thấy <span class="font-semibold text-slate-900">{{ totalCount() }}</span> sản phẩm cho
+              “<span class="font-semibold text-slate-900">{{ appliedSearch() }}</span>”
+            </p>
+          </div>
+
+          <div *ngIf="errorMessage() as msg"
+            class="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
             {{ msg }}
           </div>
 
-          <div *ngIf="state() === 'loading' && totalCount() === 0" class="rounded-2xl border border-slate-200 bg-white p-8 text-center">
+          <div *ngIf="state() === 'loading' && totalCount() === 0"
+            class="rounded-2xl border border-slate-200 bg-white p-8 text-center">
             <div class="text-sm font-semibold text-slate-900">Đang tải danh sách…</div>
           </div>
 
-          <div *ngIf="state() === 'idle' && totalCount() === 0" class="rounded-2xl border border-slate-200 bg-white p-8 text-center">
+          <div *ngIf="state() === 'idle' && totalCount() === 0 && appliedSearch()"
+            class="rounded-2xl border border-slate-200 bg-white p-8 text-center">
+            <div class="text-sm font-semibold text-slate-900">Không tìm thấy sản phẩm nào</div>
+            <div class="mt-1 text-sm text-slate-600">
+              Không có sản phẩm khớp với “{{ appliedSearch() }}”. Hãy thử từ khóa khác.
+            </div>
+            <button type="button" class="mt-4 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition
+                hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-slate-900/10" (click)="clearSearch()">
+              Xoá tìm kiếm
+            </button>
+          </div>
+
+          <div *ngIf="state() === 'idle' && totalCount() === 0 && !appliedSearch()"
+            class="rounded-2xl border border-slate-200 bg-white p-8 text-center">
             <div class="text-sm font-semibold text-slate-900">Chưa có sản phẩm</div>
             <div class="mt-1 text-sm text-slate-600">Bấm “Tạo sản phẩm mới” để thêm tác phẩm đầu tiên.</div>
           </div>
@@ -52,10 +90,7 @@
                 </thead>
 
                 <tbody class="divide-y divide-slate-200">
-                  <tr
-                    *ngFor="let p of products(); trackBy: trackByProductId"
-                    class="admin-row hover:bg-slate-50/70"
-                  >
+                  <tr *ngFor="let p of products(); trackBy: trackByProductId" class="admin-row hover:bg-slate-50/70">
                     <td class="px-4 py-3">
                       <div class="h-12 w-12 overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
                         <img [src]="p.imageUrl" [alt]="p.title" class="h-full w-full object-cover" />
@@ -72,32 +107,26 @@
                     </td>
 
                     <td class="px-4 py-3">
-                      <span class="inline-flex items-center rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700">
+                      <span
+                        class="inline-flex items-center rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700">
                         {{ p.type }}
                       </span>
                     </td>
 
                     <td class="px-4 py-3">
-                      <span
-                        class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold"
-                        [class.bg-emerald-50]="p.isAvailable"
-                        [class.text-emerald-800]="p.isAvailable"
-                        [class.border]="true"
-                        [class.border-emerald-200]="p.isAvailable"
-                        [class.bg-rose-50]="!p.isAvailable"
-                        [class.text-rose-800]="!p.isAvailable"
-                        [class.border-rose-200]="!p.isAvailable"
-                      >
+                      <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold"
+                        [class.bg-emerald-50]="p.isAvailable" [class.text-emerald-800]="p.isAvailable"
+                        [class.border]="true" [class.border-emerald-200]="p.isAvailable"
+                        [class.bg-rose-50]="!p.isAvailable" [class.text-rose-800]="!p.isAvailable"
+                        [class.border-rose-200]="!p.isAvailable">
                         {{ p.isAvailable ? 'Yes' : 'No' }}
                       </span>
                     </td>
 
                     <td class="px-4 py-3">
                       <div class="flex flex-wrap gap-1.5">
-                        <span
-                          *ngFor="let name of categoryLabels(p.categoryIds); trackBy: trackByString"
-                          class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700"
-                        >
+                        <span *ngFor="let name of categoryLabels(p.categoryIds); trackBy: trackByString"
+                          class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">
                           {{ name }}
                         </span>
                       </div>
@@ -105,21 +134,15 @@
 
                     <td class="px-4 py-3">
                       <div class="flex items-center justify-end gap-2">
-                        <a
-                          [routerLink]="['/admin/products/edit', p.id]"
-                          class="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition
-                            hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-slate-900/10"
-                        >
+                        <a [routerLink]="['/admin/products/edit', p.id]" class="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition
+                            hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-slate-900/10">
                           ✏️ Sửa
                         </a>
 
-                        <button
-                          type="button"
+                        <button type="button"
                           class="inline-flex items-center justify-center rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700 shadow-sm transition
                             hover:bg-rose-100 focus:outline-none focus:ring-4 focus:ring-rose-500/10 disabled:cursor-not-allowed disabled:opacity-60"
-                          (click)="openDeleteModal(p)"
-                          [disabled]="deletingId() === p.id"
-                        >
+                          (click)="openDeleteModal(p)" [disabled]="deletingId() === p.id">
                           <span *ngIf="deletingId() !== p.id">🗑️ Xoá</span>
                           <span *ngIf="deletingId() === p.id" class="inline-flex items-center gap-2">
                             <span class="admin-page__spinner admin-page__spinner--danger" aria-hidden="true"></span>
@@ -134,7 +157,8 @@
             </div>
 
             <!-- Pagination -->
-            <div class="flex flex-col gap-3 border-t border-slate-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div
+              class="flex flex-col gap-3 border-t border-slate-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
               <div class="text-sm text-slate-600">
                 Hiển thị
                 <span class="font-semibold text-slate-900">{{ rangeStart() }}</span>
@@ -146,34 +170,20 @@
               </div>
 
               <div class="flex items-center justify-between gap-2 sm:justify-end">
-                <button
-                  type="button"
-                  class="admin-page__pagebtn"
-                  (click)="prevPage()"
-                  [disabled]="page() === 1"
-                >
+                <button type="button" class="admin-page__pagebtn" (click)="prevPage()" [disabled]="page() === 1">
                   Previous
                 </button>
 
                 <div class="flex items-center gap-1">
-                  <button
-                    *ngFor="let p of pages(); trackBy: trackByPageToken"
-                    type="button"
-                    class="admin-page__pagenum"
-                    [class.admin-page__pagenum--active]="p === page()"
-                    [disabled]="p === '...'"
-                    (click)="p !== '...' && setPage(p)"
-                  >
+                  <button *ngFor="let p of pages(); trackBy: trackByPageToken" type="button" class="admin-page__pagenum"
+                    [class.admin-page__pagenum--active]="p === page()" [disabled]="p === '...'"
+                    (click)="p !== '...' && setPage(p)">
                     {{ p }}
                   </button>
                 </div>
 
-                <button
-                  type="button"
-                  class="admin-page__pagebtn"
-                  (click)="nextPage()"
-                  [disabled]="page() === totalPages()"
-                >
+                <button type="button" class="admin-page__pagebtn" (click)="nextPage()"
+                  [disabled]="page() === totalPages()">
                   Next
                 </button>
               </div>
@@ -199,13 +209,9 @@
               </p>
             </div>
 
-            <button
-              type="button"
+            <button type="button"
               class="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-4 focus:ring-slate-900/10"
-              (click)="closeDeleteModal()"
-              [disabled]="!!deletingId()"
-              aria-label="Close"
-            >
+              (click)="closeDeleteModal()" [disabled]="!!deletingId()" aria-label="Close">
               ✕
             </button>
           </div>
@@ -223,23 +229,17 @@
           </div>
 
           <div class="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-            <button
-              type="button"
+            <button type="button"
               class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition
                 hover:bg-slate-50 focus:outline-none focus:ring-4 focus:ring-slate-900/10 disabled:cursor-not-allowed disabled:opacity-60"
-              (click)="closeDeleteModal()"
-              [disabled]="!!deletingId()"
-            >
+              (click)="closeDeleteModal()" [disabled]="!!deletingId()">
               Huỷ
             </button>
 
-            <button
-              type="button"
+            <button type="button"
               class="inline-flex items-center justify-center rounded-xl bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition
                 hover:bg-rose-500 focus:outline-none focus:ring-4 focus:ring-rose-500/20 disabled:cursor-not-allowed disabled:opacity-60"
-              (click)="confirmDelete()"
-              [disabled]="!!deletingId()"
-            >
+              (click)="confirmDelete()" [disabled]="!!deletingId()">
               <span *ngIf="!deletingId()">Xoá sản phẩm</span>
               <span *ngIf="deletingId()" class="inline-flex items-center gap-2">
                 <span class="admin-page__spinner admin-page__spinner--danger" aria-hidden="true"></span>
@@ -252,4 +252,3 @@
     </div>
   </div>
 </main>
-

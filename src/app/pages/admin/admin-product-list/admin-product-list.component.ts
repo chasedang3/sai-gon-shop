@@ -2,7 +2,7 @@ import { NgFor, NgIf } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { Router, RouterLink } from '@angular/router';
-import { finalize, switchMap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, finalize, map, switchMap } from 'rxjs';
 import { CategoryService } from '../../../core/categories/category.service';
 import { ProductService } from '../../../core/services/product.service';
 import { Product } from '../../../core/models/product.model';
@@ -44,6 +44,14 @@ export class AdminProductListComponent {
   readonly pageSize = 12;
   readonly page = signal(1);
 
+  /** Nội dung đang gõ trong ô tìm kiếm (cập nhật mỗi lần gõ). */
+  readonly searchInput = signal('');
+  /** Từ khóa đã áp dụng cho API (sau debounce). */
+  readonly appliedSearch = signal('');
+
+  /** Gộp trang + từ khóa để chỉ gọi API một lần khi một trong hai đổi. */
+  private readonly query = computed(() => ({ page: this.page(), search: this.appliedSearch() }));
+
   readonly totalPages = computed(() => Math.max(1, Math.ceil(this.totalCount() / this.pageSize)));
 
   readonly pages = computed<PageToken[]>(() => {
@@ -80,13 +88,26 @@ export class AdminProductListComponent {
   constructor() {
     this.loadCategories();
 
-    toObservable(this.page)
+    // Gõ xong khoảng 300ms mới tìm, tránh gọi API sau mỗi phím.
+    toObservable(this.searchInput)
       .pipe(
-        switchMap((page) => {
+        debounceTime(300),
+        map((value) => value.trim()),
+        distinctUntilChanged(),
+        takeUntilDestroyed(),
+      )
+      .subscribe((search) => {
+        this.appliedSearch.set(search);
+        this.page.set(1);
+      });
+
+    toObservable(this.query)
+      .pipe(
+        switchMap(({ page, search }) => {
           this.state.set('loading');
           this.errorMessage.set(null);
           return this.productService
-            .getProductsPage({ page, pageSize: this.pageSize, all: false })
+            .getProductsPage({ page, pageSize: this.pageSize, all: false, search })
             .pipe(finalize(() => this.state.set('idle')));
         }),
         takeUntilDestroyed(),
@@ -122,7 +143,7 @@ export class AdminProductListComponent {
     this.state.set('loading');
     this.errorMessage.set(null);
     this.productService
-      .getProductsPage({ page: p, pageSize: this.pageSize, all: false })
+      .getProductsPage({ page: p, pageSize: this.pageSize, all: false, search: this.appliedSearch() })
       .pipe(finalize(() => this.state.set('idle')))
       .subscribe({
         next: ({ items, totalCount }) => {
@@ -137,6 +158,17 @@ export class AdminProductListComponent {
           this.errorMessage.set(err instanceof Error ? err.message : 'Không thể tải lại danh sách.');
         },
       });
+  }
+
+  onSearchInput(event: Event): void {
+    this.searchInput.set((event.target as HTMLInputElement).value);
+  }
+
+  clearSearch(): void {
+    this.searchInput.set('');
+    // Xóa ngay, không chờ debounce
+    this.appliedSearch.set('');
+    this.page.set(1);
   }
 
   openDeleteModal(p: Product): void {
