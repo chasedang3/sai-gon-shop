@@ -47,6 +47,16 @@ function artworkTypeFilterKey(q: ParamMap): string {
   return parseArtworkTypeFromQuery(q) ?? '';
 }
 
+/** Từ khóa tìm kiếm: ?search=... (từ ô tìm kiếm ở header). */
+function parseSearchFromQuery(q: ParamMap): string | null {
+  const raw = q.get('search')?.trim();
+  return raw ? raw.slice(0, 100) : null;
+}
+
+function searchFilterKey(q: ParamMap): string {
+  return parseSearchFromQuery(q) ?? '';
+}
+
 @Component({
   standalone: true,
   selector: 'app-product-list',
@@ -72,6 +82,8 @@ export class ProductListComponent {
   selectedCategoryId = signal<string | null>(null);
   /** SonDau | TrangGuong | Canvas — null = tất cả loại. */
   selectedArtworkType = signal<string | null>(null);
+  /** Từ khóa tìm kiếm hiện tại — null = không tìm kiếm. */
+  selectedSearch = signal<string | null>(null);
 
   readonly artworkTypeOptions = ARTWORK_TYPE_OPTIONS;
 
@@ -135,15 +147,18 @@ export class ProductListComponent {
           (a, b) =>
             (a.get('page') || '1') === (b.get('page') || '1') &&
             categoryFilterKey(a) === categoryFilterKey(b) &&
-            artworkTypeFilterKey(a) === artworkTypeFilterKey(b),
+            artworkTypeFilterKey(a) === artworkTypeFilterKey(b) &&
+            searchFilterKey(a) === searchFilterKey(b),
         ),
         switchMap((q) => {
           const page = Math.max(1, parseInt(q.get('page') || '1', 10) || 1);
           const categoryId = parseCategoryIdFromQuery(q);
           const artworkType = parseArtworkTypeFromQuery(q);
+          const search = parseSearchFromQuery(q);
           this.currentPage.set(page);
           this.selectedCategoryId.set(categoryId);
           this.selectedArtworkType.set(artworkType);
+          this.selectedSearch.set(search);
           this.products.set([]);
           this.totalCount.set(0);
           this.loading.set(true);
@@ -155,6 +170,7 @@ export class ProductListComponent {
               all: false,
               categoryId: categoryId ?? undefined,
               type: artworkType ?? undefined,
+              search: search ?? undefined,
             })
             .pipe(finalize(() => this.loading.set(false)));
         }),
@@ -223,6 +239,14 @@ export class ProductListComponent {
     void this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { type: normalized, page: 1 },
+      queryParamsHandling: 'merge',
+    });
+  }
+
+  clearSearch(): void {
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { search: null, page: 1 },
       queryParamsHandling: 'merge',
     });
   }

@@ -11,24 +11,30 @@
       <div class="artwork-type-filter" role="group" aria-label="Lọc theo loại tranh">
         <span class="artwork-type-filter-label">Loại tranh</span>
         <div class="artwork-type-filter-buttons">
-          <button
-            type="button"
-            class="artwork-type-pill"
-            [class.artwork-type-pill--active]="!selectedArtworkType()"
-            (click)="selectArtworkType(null)"
-          >
+          <button type="button" class="artwork-type-pill" [class.artwork-type-pill--active]="!selectedArtworkType()"
+            (click)="selectArtworkType(null)">
             Tất cả
           </button>
-          <button
-            *ngFor="let opt of artworkTypeOptions"
-            type="button"
-            class="artwork-type-pill"
+          <button *ngFor="let opt of artworkTypeOptions" type="button" class="artwork-type-pill"
             [class.artwork-type-pill--active]="selectedArtworkType() === opt.value"
-            (click)="selectArtworkType(opt.value)"
-          >
+            (click)="selectArtworkType(opt.value)">
             {{ opt.label }}
           </button>
         </div>
+      </div>
+
+      <div *ngIf="selectedSearch()" class="mt-4 flex flex-wrap items-center justify-center gap-3 text-sm" role="status">
+        <span>
+          <ng-container *ngIf="!loading() && !error(); else searching">
+            Tìm thấy <strong>{{ totalCount() }}</strong> sản phẩm cho
+          </ng-container>
+          <ng-template #searching>Kết quả cho</ng-template>
+          “<strong>{{ selectedSearch() }}</strong>”
+        </span>
+        <button type="button" class="rounded-full border border-current px-3 py-1 text-xs font-medium"
+          (click)="clearSearch()">
+          Xóa tìm kiếm
+        </button>
       </div>
 
       <p *ngIf="categoriesLoadError()" class="category-filter-msg category-filter-msg--warn" role="status">
@@ -43,22 +49,15 @@
     <div class="product-list-layout">
       <aside class="product-list-sidebar">
         <div class="category-filter">
-          <button
-            type="button"
-            class="category-filter-mobile-toggle md:hidden"
-            (click)="toggleFilterPanel()"
-            [attr.aria-expanded]="filterPanelOpen()"
-          >
+          <button type="button" class="category-filter-mobile-toggle md:hidden" (click)="toggleFilterPanel()"
+            [attr.aria-expanded]="filterPanelOpen()">
             Danh mục
             <span class="category-filter-hint" *ngIf="selectedCategoryId()">
               · {{ selectedCategoryLabel() }}
             </span>
           </button>
 
-          <div
-            class="category-filter-panel"
-            [class.category-filter-panel--open]="filterPanelOpen()"
-          >
+          <div class="category-filter-panel" [class.category-filter-panel--open]="filterPanelOpen()">
             <div class="category-filter-panel-inner">
               <h3 class="category-filter-heading">Lọc theo danh mục</h3>
               <p class="category-filter-help">
@@ -67,45 +66,24 @@
 
               <div class="category-filter-toolbar">
                 <label class="category-filter-search-label" for="category-search-input">Tìm nhanh</label>
-                <input
-                  id="category-search-input"
-                  type="search"
-                  class="category-filter-search"
-                  placeholder="Gõ tên danh mục…"
-                  autocomplete="off"
-                  [value]="categorySearch()"
-                  (input)="onCategorySearch($event)"
-                />
-                <button
-                  *ngIf="selectedCategoryId()"
-                  type="button"
-                  class="category-filter-clear"
-                  (click)="clearCategoryFilter()"
-                >
+                <input id="category-search-input" type="search" class="category-filter-search"
+                  placeholder="Gõ tên danh mục…" autocomplete="off" [value]="categorySearch()"
+                  (input)="onCategorySearch($event)" />
+                <button *ngIf="selectedCategoryId()" type="button" class="category-filter-clear"
+                  (click)="clearCategoryFilter()">
                   Đặt lại
                 </button>
               </div>
 
               <div class="category-radiolist" role="radiogroup" aria-label="Danh mục">
                 <label class="category-radio-item">
-                  <input
-                    type="radio"
-                    name="shop-product-category"
-                    [checked]="!selectedCategoryId()"
-                    (change)="selectCategory(null)"
-                  />
+                  <input type="radio" name="shop-product-category" [checked]="!selectedCategoryId()"
+                    (change)="selectCategory(null)" />
                   <span class="category-radio-label">Tất cả sản phẩm</span>
                 </label>
-                <label
-                  *ngFor="let c of filteredCategories(); trackBy: trackByCategoryId"
-                  class="category-radio-item"
-                >
-                  <input
-                    type="radio"
-                    name="shop-product-category"
-                    [checked]="selectedCategoryId() === c.id"
-                    (change)="selectCategory(c.id)"
-                  />
+                <label *ngFor="let c of filteredCategories(); trackBy: trackByCategoryId" class="category-radio-item">
+                  <input type="radio" name="shop-product-category" [checked]="selectedCategoryId() === c.id"
+                    (change)="selectCategory(c.id)" />
                   <span class="category-radio-label">{{ c.name }}</span>
                 </label>
                 <p *ngIf="!filteredCategories().length" class="category-filter-empty">
@@ -122,33 +100,26 @@
           Đang tải sản phẩm…
         </div>
 
-        <div
-          *ngIf="!loading() && !error() && products().length === 0"
-          class="product-list-empty"
-        >
-          <ng-container *ngIf="selectedCategoryId(); else emptyAll">
-            Không có sản phẩm nào trong danh mục này.
+        <div *ngIf="!loading() && !error() && products().length === 0" class="product-list-empty">
+          <ng-container *ngIf="selectedSearch(); else noSearch">
+            Không tìm thấy sản phẩm nào khớp với “{{ selectedSearch() }}”. Hãy thử từ khóa khác.
           </ng-container>
+          <ng-template #noSearch>
+            <ng-container *ngIf="selectedCategoryId(); else emptyAll">
+              Không có sản phẩm nào trong danh mục này.
+            </ng-container>
+          </ng-template>
           <ng-template #emptyAll>
             Chưa có sản phẩm nào.
           </ng-template>
         </div>
 
         <div class="featured-grid" *ngIf="!loading() && !error() && products().length > 0">
-          <a
-            *ngFor="let product of products(); trackBy: trackByProductId"
-            class="card-link"
-            [routerLink]="['/products', product.id]"
-          >
+          <a *ngFor="let product of products(); trackBy: trackByProductId" class="card-link"
+            [routerLink]="['/products', product.id]">
             <div class="card">
               <div class="card-image">
-                <img
-                  [src]="product.imageUrl"
-                  alt="{{ product.title }}"
-                  width="400"
-                  height="500"
-                  loading="lazy"
-                />
+                <img [src]="product.imageUrl" alt="{{ product.title }}" width="400" height="500" loading="lazy" />
               </div>
               <div class="card-body">
                 <h3 class="card-title">
@@ -162,30 +133,17 @@
           </a>
         </div>
 
-        <div
-          *ngIf="!loading() && !error() && totalCount() > pageSize"
-          class="pagination"
-        >
+        <div *ngIf="!loading() && !error() && totalCount() > pageSize" class="pagination">
           <div class="pagination-controls">
-            <button
-              type="button"
-              class="pagination-button"
-              [class.pagination-button--disabled]="currentPage() === 1"
-              (click)="previousPage()"
-              [disabled]="currentPage() === 1"
-            >
+            <button type="button" class="pagination-button" [class.pagination-button--disabled]="currentPage() === 1"
+              (click)="previousPage()" [disabled]="currentPage() === 1">
               Trước
             </button>
 
             <div class="pagination-pages" role="group" aria-label="Danh sách trang">
               <ng-container *ngFor="let item of paginationItems(); trackBy: trackByPaginationItem">
-                <button
-                  *ngIf="item !== 'ellipsis'; else ellipsisTpl"
-                  type="button"
-                  class="pagination-page"
-                  [class.pagination-page--active]="currentPage() === item"
-                  (click)="goToPage(item)"
-                >
+                <button *ngIf="item !== 'ellipsis'; else ellipsisTpl" type="button" class="pagination-page"
+                  [class.pagination-page--active]="currentPage() === item" (click)="goToPage(item)">
                   {{ item }}
                 </button>
               </ng-container>
@@ -194,13 +152,9 @@
               </ng-template>
             </div>
 
-            <button
-              type="button"
-              class="pagination-button"
-              [class.pagination-button--disabled]="currentPage() === totalPages()"
-              (click)="nextPage()"
-              [disabled]="currentPage() === totalPages()"
-            >
+            <button type="button" class="pagination-button"
+              [class.pagination-button--disabled]="currentPage() === totalPages()" (click)="nextPage()"
+              [disabled]="currentPage() === totalPages()">
               Sau
             </button>
           </div>

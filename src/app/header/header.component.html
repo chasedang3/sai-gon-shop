@@ -25,15 +25,19 @@
                             aria-label="Close" data-bs-target="#bdNavbar"></button>
                     </div>
                     <div class="offcanvas-body align-items-center justify-content-center">
+                        <!-- Tìm kiếm (mobile) -->
                         <div class="search d-block d-lg-none m-5">
-                            <form class=" position-relative">
-                                <input type="text" class="form-control bg-secondary border-0 rounded-5 px-4 py-2"
-                                    placeholder="Search...">
-                                <a href="#" class="position-absolute top-50 end-0 translate-middle-y p-1 me-3">
-                                    <svg class="" width="20" height="20">
+                            <form class="position-relative" role="search" (submit)="onSearch($event, true)">
+                                <input type="text" name="search" autocomplete="off" enterkeyhint="search"
+                                    aria-label="Tìm kiếm tranh"
+                                    class="form-control bg-secondary border-0 rounded-5 px-4 py-2"
+                                    placeholder="Tìm kiếm..." [formControl]="searchControl">
+                                <button type="submit" aria-label="Tìm kiếm"
+                                    class="position-absolute top-50 end-0 translate-middle-y p-1 me-3 border-0 bg-transparent">
+                                    <svg width="20" height="20">
                                         <use xlink:href="#search"></use>
                                     </svg>
-                                </a>
+                                </button>
                             </form>
                         </div>
                         <ul class="navbar-nav align-items-center mb-2 mb-lg-0">
@@ -54,44 +58,32 @@
                                     role="button" aria-expanded="false">Sản phẩm khác</a>
                                 <ul class="dropdown-menu dropdown-menu-end animate slide mt-3 border-0 shadow">
                                     <li>
-                                        <a
-                                            routerLink="/products"
-                                            [queryParams]="{
+                                        <a routerLink="/products" [queryParams]="{
                                                 type: 'SonDau',
                                                 page: 1,
                                                 category: null,
                                                 categories: null
-                                            }"
-                                            class="dropdown-item"
-                                        >
+                                            }" class="dropdown-item">
                                             Tranh Sơn Dầu
                                         </a>
                                     </li>
                                     <li>
-                                        <a
-                                            routerLink="/products"
-                                            [queryParams]="{
+                                        <a routerLink="/products" [queryParams]="{
                                                 type: 'Canvas',
                                                 page: 1,
                                                 category: null,
                                                 categories: null
-                                            }"
-                                            class="dropdown-item"
-                                        >
+                                            }" class="dropdown-item">
                                             Tranh Canvas
                                         </a>
                                     </li>
                                     <li>
-                                        <a
-                                            routerLink="/products"
-                                            [queryParams]="{
+                                        <a routerLink="/products" [queryParams]="{
                                                 type: 'TrangGuong',
                                                 page: 1,
                                                 category: null,
                                                 categories: null
-                                            }"
-                                            class="dropdown-item"
-                                        >
+                                            }" class="dropdown-item">
                                             Tranh Tráng Gương
                                         </a>
                                     </li>
@@ -100,15 +92,18 @@
                         </ul>
                     </div>
                 </div>
+                <!-- Tìm kiếm (desktop) -->
                 <div class="search d-lg-block d-none">
-                    <form class=" position-relative">
-                        <input type="text" class="form-control bg-secondary border-0 rounded-5 px-4 py-2"
-                            placeholder="Tìm kiếm...">
-                        <a href="#" class="position-absolute top-50 end-0 translate-middle-y p-1 me-3">
-                            <svg class="" width="20" height="20">
+                    <form class="position-relative" role="search" (submit)="onSearch($event)">
+                        <input type="text" name="search" autocomplete="off" enterkeyhint="search"
+                            aria-label="Tìm kiếm tranh" class="form-control bg-secondary border-0 rounded-5 px-4 py-2"
+                            placeholder="Tìm kiếm..." [formControl]="searchControl">
+                        <button type="submit" aria-label="Tìm kiếm"
+                            class="position-absolute top-50 end-0 translate-middle-y p-1 me-3 border-0 bg-transparent">
+                            <svg width="20" height="20">
                                 <use xlink:href="#search"></use>
                             </svg>
-                        </a>
+                        </button>
                     </form>
                 </div>
             </div>

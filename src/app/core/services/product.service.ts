@@ -69,6 +69,8 @@ export class ProductService {
     categoryId?: string | null;
     /** Loại tranh: SonDau | TrangGuong | Canvas — GET ...&type= */
     type?: string | null;
+    /** Từ khóa tìm kiếm: GET ...&search= */
+    search?: string | null;
   }): Observable<PagedProducts> {
     let httpParams = new HttpParams()
       .set('page', String(params.page))
@@ -83,6 +85,11 @@ export class ProductService {
     const typ = params.type?.trim();
     if (typ) {
       httpParams = httpParams.set('type', typ);
+    }
+
+    const keyword = params.search?.trim();
+    if (keyword) {
+      httpParams = httpParams.set('search', keyword);
     }
 
     return this.http.get<unknown>(this.artworksApiUrl, { params: httpParams }).pipe(
