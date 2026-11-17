@@ -1,135 +1,235 @@
-<section class="guide-page">
-  <div class="guide-container">
+<main class="bg-[#F8F7F4] px-4 py-10 text-slate-900 sm:px-6 sm:py-14">
+  <div class="mx-auto flex max-w-[880px] flex-col gap-5 sm:gap-6">
     <!-- Hero -->
-    <section class="guide-card hero-card">
-      <p class="guide-eyebrow">Hướng dẫn treo tranh</p>
-      <h1 class="guide-title">
-        Hướng dẫn treo tranh canvas bằng đinh 3 chân
+    <section class="flex flex-col gap-5 rounded-[28px] border border-stone-200 bg-white p-5 sm:p-8 lg:p-12">
+      <p class="text-sm font-semibold uppercase tracking-[0.12em] text-slate-500 mb-0">
+        Hướng dẫn tranh tráng gương
+      </p>
+      <h1 class="text-3xl font-bold leading-tight tracking-tight sm:text-4xl lg:text-[44px] mb-0">
+        Chọn đúng kích thước, hiểu cấu tạo và tự treo tranh tại nhà
       </h1>
-      <p class="guide-subtitle">
-        Một hướng dẫn chi tiết, dễ thực hiện để bạn có thể tự treo tranh canvas tại nhà mà vẫn đảm bảo thẩm mỹ và độ an toàn cho bức tường.
+      <p class="max-w-[720px] text-base leading-7 text-slate-600 sm:text-[17px] sm:leading-[1.7] mb-0">
+        Một hướng dẫn gọn gàng giúp bạn ước lượng kích thước tranh theo không gian, biết tranh được
+        làm từ những lớp nào, và tự tay treo tranh lên tường chỉ với một chiếc búa nhỏ.
       </p>
+
+      <nav class="mt-2 flex flex-col gap-3 border-t border-stone-200 pt-5" aria-label="Mục lục">
+        <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Nội dung chính</span>
+        <ul class="flex flex-wrap gap-2">
+          @for (item of toc; track item.id) {
+          <li>
+            <a [href]="'#' + item.id" (click)="scrollTo($event, item.id)"
+              class="inline-block rounded-full bg-slate-100 px-4 py-2 text-sm font-medium text-slate-900 transition hover:bg-amber-100 hover:text-amber-800">
+              {{ item.label }}
+            </a>
+          </li>
+          }
+        </ul>
+      </nav>
     </section>
 
-    <!-- Section 1: Đinh 3 chân là gì -->
-    <section class="guide-card">
-      <h2 class="guide-section-heading">
-        Đinh 3 chân là gì? Khi nào nên dùng?
-      </h2>
-      <p class="guide-text">
-        Đinh 3 chân là loại đinh treo tranh có ba mũi nhọn cắm vào tường và một móc treo phía trước để giữ khung hoặc dây treo. Cấu trúc này giúp đinh bám chắc vào tường mà không cần khoan nở, rất phù hợp để treo tranh canvas kích thước vừa và nhỏ.
-      </p>
-      <p class="guide-text">
-        Bạn nên dùng đinh 3 chân cho các loại tường gạch, bê tông, vữa chắc. Với những bức tranh nặng hơn, có thể dùng hai đinh 3 chân để chia tải trọng và giúp tranh ít bị xệ theo thời gian.
-      </p>
+    <!-- Phần 1: Kích thước -->
+    <section id="size"
+      class="grid scroll-mt-6 items-center gap-8 rounded-[28px] border border-stone-200 bg-white p-5 sm:p-8 md:grid-cols-2 md:gap-10 lg:p-10">
+      <div class="flex flex-col gap-4">
+        <p class="text-[13px] font-semibold uppercase tracking-[0.12em] text-slate-500 mb-0">Phần 1</p>
+        <h2 class="text-2xl font-bold leading-tight sm:text-3xl mb-0">Ước lượng kích thước tranh</h2>
+        <p class="text-base leading-7 text-slate-600 mb-0">
+          Cách dễ nhất để chọn kích thước là so với món nội thất bên dưới. Trong ảnh minh họa, chiếc
+          sofa dài 220 cm và cao 75 cm, phần lưng ghế rộng 85 cm. Tranh khổ lớn 80x150 cm có chiều
+          dài khoảng hai phần ba sofa, còn các khổ nhỏ hợp để ghép cụm hoặc treo ở góc nhỏ.
+        </p>
+        <ul class="flex flex-wrap gap-2">
+          @for (size of sizes; track size) {
+          <li class="rounded-full bg-slate-900 px-3.5 py-2 text-[13px] font-semibold text-white">
+            {{ size }}
+          </li>
+          }
+        </ul>
+        <p class="text-[13px] text-slate-500">Đơn vị: cm (rộng x cao).</p>
+      </div>
+      <figure class="flex flex-col gap-2.5">
+        <img [src]="images.size.src" [alt]="images.size.alt" [attr.width]="images.size.width"
+          [attr.height]="images.size.height" loading="lazy" class="h-auto w-full rounded-2xl border border-stone-200" />
+        <figcaption class="text-[13px] text-slate-500 mb-0">
+          Bảng kích thước tranh đặt cạnh sofa để dễ hình dung.
+        </figcaption>
+      </figure>
     </section>
 
-    <!-- Section 2: Chuẩn bị dụng cụ -->
-    <section class="guide-card">
-      <h2 class="guide-section-heading">
-        Chuẩn bị dụng cụ
-      </h2>
-      <ul class="guide-list">
-        <li>1&ndash;2 bộ đinh 3 chân (tùy kích thước và trọng lượng tranh).</li>
-        <li>Một chiếc búa nhỏ hoặc búa cao su.</li>
-        <li>Thước dây hoặc thước mét để đo vị trí.</li>
-        <li>Bút chì để đánh dấu trên tường.</li>
-        <li>Thước thủy hoặc ứng dụng đo độ thẳng trên điện thoại (nếu có).</li>
-        <li>Khăn mềm hoặc tấm chăn mỏng để đặt tranh khi thao tác.</li>
-      </ul>
+    <!-- Phần 2: Cấu tạo -->
+    <section id="structure"
+      class="grid scroll-mt-6 items-center gap-8 rounded-[28px] border border-stone-200 bg-white p-5 sm:p-8 md:grid-cols-2 md:gap-10 lg:p-10">
+      <figure class="flex flex-col gap-2.5 md:order-first">
+        <img [src]="images.structure.src" [alt]="images.structure.alt" [attr.width]="images.structure.width"
+          [attr.height]="images.structure.height" loading="lazy"
+          class="h-auto w-full rounded-2xl border border-stone-200" />
+        <figcaption class="text-[13px] text-slate-500">
+          Cấu tạo tranh tráng gương khung viền composite.
+        </figcaption>
+      </figure>
+      <div class="order-first flex flex-col gap-4 md:order-none">
+        <p class="text-[13px] font-semibold uppercase tracking-[0.12em] text-slate-500 mb-0">Phần 2</p>
+        <h2 class="text-2xl font-bold leading-tight sm:text-3xl mb-0">Tranh được làm từ 4 lớp</h2>
+        <ol class="flex flex-col gap-3.5">
+          @for (layer of layers; track layer.label) {
+          <li class="flex items-start gap-3.5">
+            <span class="shrink-0 rounded-full bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white">
+              {{ layer.label }}
+            </span>
+            <span class="text-[15px] leading-relaxed text-slate-600">
+              <strong class="font-semibold text-slate-900">{{ layer.title }}</strong>
+              {{ layer.desc }}
+            </span>
+          </li>
+          }
+        </ol>
+      </div>
     </section>
 
-    <!-- Section 3: Xác định vị trí -->
-    <section class="guide-card">
-      <h2 class="guide-section-heading">
-        Xác định vị trí treo tranh
-      </h2>
-      <p class="guide-text">
-        Trước khi đóng đinh, hãy dành thời gian chọn đúng vị trí treo. Với tranh treo ngang tầm mắt, tâm tranh thường đẹp nhất khi cách sàn khoảng 145&ndash;160&nbsp;cm, tùy chiều cao trung bình của mọi người trong nhà.
-      </p>
-      <p class="guide-text">
-        Nếu treo tranh phía trên sofa hoặc giường, khoảng cách từ mép dưới tranh đến lưng ghế/đầu giường nên vào khoảng 20&ndash;30&nbsp;cm. Điều này giúp tổng thể không bị rời rạc cũng không quá nặng nề.
-      </p>
-      <p class="guide-text">
-        Sau khi thử nhiều vị trí bằng cách ướm tranh lên tường, hãy dùng bút chì chấm nhẹ tại điểm bạn mong muốn đặt đỉnh của bức tranh hoặc vị trí tâm của bố cục.
-      </p>
+    <!-- Phần 3: Viền khung -->
+    <section id="frame"
+      class="grid scroll-mt-6 items-center gap-8 rounded-[28px] border border-stone-200 bg-white p-5 sm:p-8 md:grid-cols-2 md:gap-10 lg:p-10">
+      <div class="flex flex-col gap-4">
+        <p class="text-[13px] font-semibold uppercase tracking-[0.12em] text-slate-500 mb-0">Phần 3</p>
+        <h2 class="text-2xl font-bold leading-tight sm:text-3xl mb-0">Viền khung mạ vàng, bền và gọn</h2>
+        <p class="text-base leading-7 text-slate-600 mb-0">
+          Viền khung được thiết kế mảnh, với các thông số trong ảnh là 0.2 cm và 1 cm, giúp tranh
+          nhìn thanh thoát mà vẫn chắc chắn khi treo.
+        </p>
+        <ul class="flex flex-col gap-3">
+          @for (feature of features; track feature.title) {
+          <li class="flex items-center gap-3 text-[15px] font-medium">
+            <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-800">
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                @switch (feature.icon) {
+                @case ('diamond') {
+                <polygon points="12,3 21,10 12,21 3,10"></polygon>
+                }
+                @case ('water') {
+                <path d="M12 3 C12 3 5 11 5 15 a7 7 0 0 0 14 0 C19 11 12 3 12 3 Z"></path>
+                }
+                @case ('shield') {
+                <path d="M12 3 L20 6 V12 C20 17 16 20 12 21 C8 20 4 17 4 12 V6 Z"></path>
+                }
+                }
+              </svg>
+            </span>
+            {{ feature.title }}
+          </li>
+          }
+        </ul>
+      </div>
+      <figure class="flex flex-col gap-2.5">
+        <img [src]="images.frame.src" [alt]="images.frame.alt" [attr.width]="images.frame.width"
+          [attr.height]="images.frame.height" loading="lazy"
+          class="h-auto w-full rounded-2xl border border-stone-200" />
+        <figcaption class="text-[13px] text-slate-500">Cận cảnh viền khung mạ vàng.</figcaption>
+      </figure>
     </section>
 
-    <!-- Section 4: Đo và đánh dấu vị trí đinh -->
-    <section class="guide-card">
-      <h2 class="guide-section-heading">
-        Đo và đánh dấu vị trí đinh 3 chân
-      </h2>
-      <p class="guide-text">
-        Lật mặt sau tranh để xác định móc treo hoặc dây treo. Đo khoảng cách từ mép trên của khung xuống đến điểm móc treo. Con số này sẽ giúp bạn chuyển chính xác vị trí từ khung lên tường.
+    <!-- Phần 4: Hình ảnh thực tế -->
+    <section id="photos"
+      class="flex scroll-mt-6 flex-col gap-5 rounded-[28px] border border-stone-200 bg-white p-5 sm:p-8 lg:p-10">
+      <p class="text-[13px] font-semibold uppercase tracking-[0.12em] text-slate-500 mb-0">Phần 4</p>
+      <h2 class="text-2xl font-bold leading-tight sm:text-3xl mb-0">Một số hình ảnh sản phẩm thực tế</h2>
+      <p class="text-base leading-7 text-slate-600 mb-0">
+        Tranh đơn khổ lớn, bộ ba, bộ năm hay khung tròn đều được hoàn thiện với viền khung đồng bộ.
+        Dưới đây là các sản phẩm đã sản xuất.
       </p>
-      <p class="guide-text">
-        Trên tường, từ dấu thể hiện mép trên tranh, dóng xuống đúng khoảng cách bạn vừa đo được. Đó chính là vị trí đặt móc của đinh 3 chân. Với tranh lớn, hãy đo thêm khoảng cách giữa hai móc treo và đánh dấu hai điểm trên tường sao cho chúng cùng cao, dùng thước thủy hoặc ứng dụng cân thẳng để hỗ trợ.
-      </p>
+      <figure class="flex flex-col gap-2.5">
+        <img [src]="images.photos.src" [alt]="images.photos.alt" [attr.width]="images.photos.width"
+          [attr.height]="images.photos.height" loading="lazy"
+          class="h-auto w-full rounded-2xl border border-stone-200" />
+        <figcaption class="text-[13px] text-slate-500">Hình ảnh thực tế các mẫu tranh đã hoàn thiện.</figcaption>
+      </figure>
     </section>
 
-    <!-- Section 5: Đóng đinh 3 chân -->
-    <section class="guide-card">
-      <h2 class="guide-section-heading">
-        Cách đóng đinh 3 chân đúng
-      </h2>
-      <ol class="guide-steps">
-        <li>
-          <span class="step-label">Bước 1</span>
-          <span>
-            Đặt đinh 3 chân lên dấu đã đánh, sao cho móc hướng lên trên và ba mũi nhọn áp sát bề mặt tường.
-          </span>
-        </li>
-        <li>
-          <span class="step-label">Bước 2</span>
-          <span>
-            Dùng búa gõ nhẹ và đều lên phần nhựa hoặc kim loại của đinh để ba chân từ từ ăn vào tường. Tránh gõ quá mạnh ngay từ đầu để hạn chế làm nứt vữa hoặc cong đinh.
-          </span>
-        </li>
-        <li>
-          <span class="step-label">Bước 3</span>
-          <span>
-            Sau khi đóng xong, dùng tay thử lắc nhẹ đinh. Nếu đinh chắc và không xê dịch, bạn có thể yên tâm treo tranh. Nếu cảm thấy lỏng, hãy rút đinh ra, dịch sang vị trí mới cách đó một chút rồi đóng lại.
-          </span>
-        </li>
-      </ol>
+    <!-- Phần 5: Cách treo -->
+    <section id="hang"
+      class="flex scroll-mt-6 flex-col gap-7 rounded-[28px] border border-stone-200 bg-white p-5 sm:p-8 lg:p-10">
+      <div class="flex flex-col gap-3">
+        <p class="text-[13px] font-semibold uppercase tracking-[0.12em] text-slate-500 mb-0">Phần 5</p>
+        <h2 class="text-2xl font-bold leading-tight sm:text-3xl mb-0">Cách treo tranh chỉ với 3 bước</h2>
+        <p class="text-base leading-7 text-slate-600 mb-0">
+          Bạn cần chuẩn bị một chiếc búa nhỏ, ghim treo tranh (đinh 3 chấu) và móc treo đi kèm tranh.
+        </p>
+      </div>
+
+      <div class="grid items-center gap-8 md:grid-cols-2 md:gap-10">
+        <figure class="flex flex-col gap-2.5">
+          <img [src]="images.hang.src" [alt]="images.hang.alt" [attr.width]="images.hang.width"
+            [attr.height]="images.hang.height" loading="lazy"
+            class="h-auto w-full rounded-2xl border border-stone-200" />
+          <figcaption class="text-[13px] text-slate-500">Minh họa 3 bước treo tranh.</figcaption>
+        </figure>
+        <ol class="flex flex-col gap-5">
+          @for (step of hangSteps; track step.label) {
+          <li class="flex flex-col gap-2">
+            <span class="self-start rounded-full bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white">
+              {{ step.label }}
+            </span>
+            <span class="text-[15px] leading-relaxed text-slate-600">{{ step.text }}</span>
+          </li>
+          }
+        </ol>
+      </div>
+
+      <div class="flex items-start gap-2.5 rounded-[14px] bg-amber-100 px-4 py-3.5 text-amber-800">
+        <svg class="mt-0.5 h-[18px] w-[18px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="9"></circle>
+          <line x1="12" y1="8" x2="12" y2="12.5"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <p class="text-sm font-medium leading-relaxed mb-0">
+          Sau khi đóng xong, thử lắc nhẹ ghim. Nếu ghim chắc, bạn có thể treo tranh. Nếu cảm thấy
+          lỏng, rút ra, dịch sang vị trí gần đó rồi đóng lại.
+        </p>
+      </div>
     </section>
 
-    <!-- Section 6: Treo tranh và cân chỉnh -->
-    <section class="guide-card">
-      <h2 class="guide-section-heading">
-        Treo tranh và cân chỉnh
-      </h2>
-      <p class="guide-text">
-        Móc phần dây treo hoặc móc phía sau khung tranh vào đinh 3 chân, sau đó đứng lùi lại 2&ndash;3&nbsp;m để quan sát tổng thể. Bạn có thể chỉnh nhẹ sang trái hoặc phải để tranh cân với sofa, bàn, hoặc các yếu tố khác trong phòng.
-      </p>
-      <p class="guide-text">
-        Nếu có thước thủy nhỏ dành cho khung tranh, hãy đặt lên mép trên khung để chỉnh cho bọt nước nằm giữa, đảm bảo tranh thật thẳng và cân đối.
-      </p>
+    <!-- Phần 6: Đổi trả và bảo hành -->
+    <section id="policy"
+      class="grid scroll-mt-6 items-center gap-8 rounded-[28px] border border-stone-200 bg-white p-5 sm:p-8 md:grid-cols-2 md:gap-10 lg:p-10">
+      <div class="flex flex-col gap-5">
+        <p class="text-[13px] font-semibold uppercase tracking-[0.12em] text-slate-500 mb-0">Phần 6</p>
+        <h2 class="text-2xl font-bold leading-tight sm:text-3xl mb-0">Đổi trả và bảo hành</h2>
+        @for (policy of policies; track policy.title) {
+        <div class="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-[18px]">
+          <h3 class="text-[17px] font-semibold">{{ policy.title }}</h3>
+          <p class="text-[15px] leading-relaxed text-slate-600">{{ policy.desc }}</p>
+        </div>
+        }
+      </div>
+      <figure class="flex flex-col gap-2.5">
+        <img [src]="images.policy.src" [alt]="images.policy.alt" [attr.width]="images.policy.width"
+          [attr.height]="images.policy.height" loading="lazy"
+          class="h-auto w-full rounded-2xl border border-stone-200" />
+        <figcaption class="text-[13px] text-slate-500">Chính sách đổi trả và bảo hành của shop.</figcaption>
+      </figure>
     </section>
 
-    <!-- Section 7: Lưu ý quan trọng -->
-    <section class="guide-card">
-      <h2 class="guide-section-heading">
-        Một vài lưu ý quan trọng
-      </h2>
-      <ul class="guide-list">
-        <li>Luôn kiểm tra tải trọng tối đa của đinh 3 chân và so sánh với trọng lượng tranh.</li>
-        <li>Không dùng đinh 3 chân cho tường quá yếu, ẩm hoặc dễ bong tróc; khi đó nên dùng khoan nở và vít.</li>
-        <li>Hạn chế đóng đinh tại vị trí có thể đi đường điện âm tường (ngay phía trên ổ cắm, công tắc).</li>
-        <li>Với người thích thay tranh thường xuyên, đinh 3 chân là lựa chọn linh hoạt, ít để lại dấu lớn trên tường.</li>
+    <!-- Lưu ý -->
+    <section class="flex flex-col gap-4 rounded-[28px] border border-stone-200 bg-white p-5 sm:p-8 lg:p-10">
+      <h2 class="text-2xl font-bold leading-tight mb-0">Một vài lưu ý quan trọng</h2>
+      <ul class="flex list-disc flex-col gap-2.5 pl-5 text-base leading-7 text-slate-600 mb-0">
+        @for (note of notes; track note) {
+        <li>{{ note }}</li>
+        }
       </ul>
     </section>
 
     <!-- CTA -->
-    <section class="guide-card cta-card">
-      <h2 class="guide-section-heading">
+    <section class="flex flex-col gap-3.5 rounded-[28px] bg-slate-900 p-6 text-white sm:p-10">
+      <h2 class="text-2xl font-bold leading-snug sm:text-[28px] mb-0 text-white">
         Biến bức tường thành góc gallery nhỏ của riêng bạn
       </h2>
-      <p class="guide-text">
-        Chỉ với vài dụng cụ đơn giản và một chút tỉ mỉ, bạn đã có thể tự tay treo tranh canvas gọn gàng, an toàn và đầy cảm xúc trong không gian sống.
+      <p class="max-w-[680px] text-base leading-7 text-slate-300 mb-0">
+        Chỉ với vài dụng cụ đơn giản và một chút tỉ mỉ, bạn đã có thể tự tay treo tranh gọn gàng, an
+        toàn và đầy cảm xúc trong không gian sống.
       </p>
     </section>
   </div>
-</section>
-
+</main>
