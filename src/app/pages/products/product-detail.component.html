@@ -12,19 +12,10 @@
       <div class="product-detail-layout">
         <div class="product-detail-image-col">
           <div class="product-detail-image-wrapper">
-            <button
-              type="button"
-              class="product-detail-image-zoom"
-              (click)="openImageLightbox()"
-              [attr.aria-label]="'Xem ảnh toàn màn hình: ' + p.title"
-            >
-              <img
-                [src]="imageUrlOrPlaceholder()"
-                [alt]="p.title"
-                width="900"
-                height="900"
-                class="product-detail-image"
-              />
+            <button type="button" class="product-detail-image-zoom" (click)="openImageLightbox()"
+              [attr.aria-label]="'Xem ảnh toàn màn hình: ' + p.title">
+              <img [src]="imageUrlOrPlaceholder()" [alt]="p.title" width="900" height="900"
+                class="product-detail-image" />
             </button>
             <span class="product-detail-zoom-hint" aria-hidden="true">Nhấn để phóng to</span>
           </div>
@@ -33,16 +24,11 @@
         <div class="product-detail-info-col">
           <div class="product-meta">
             <span class="product-badge">Sản phẩm nổi bật</span>
-            <span class="product-id">Mã: {{ p.id }}</span>
           </div>
 
           <div *ngIf="p.categories?.length" class="product-categories">
-            <a
-              *ngFor="let c of p.categories"
-              [routerLink]="['/products']"
-              [queryParams]="{ category: c.id, page: 1, categories: null }"
-              class="product-category-link"
-            >
+            <a *ngFor="let c of p.categories" [routerLink]="['/products']"
+              [queryParams]="{ category: c.id, page: 1, categories: null }" class="product-category-link">
               {{ c.name }}
             </a>
           </div>
@@ -76,7 +62,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="product-description-card">
         <h2 class="section-title">
           Mô tả sản phẩm
@@ -86,58 +72,147 @@
         </p>
       </div>
 
-      <div class="install-card">
-        <div class="install-card-header">
-          <h2 class="section-title">
-            Hướng dẫn lắp đặt
-          </h2>
-          <p class="install-subtitle">
-            Đây là nội dung mẫu. Bạn có thể cập nhật chi tiết hướng dẫn lắp đặt phù hợp với từng sản phẩm.
-          </p>
+      <!-- Guild -->
+      <section
+        class="flex flex-col gap-6 rounded-3xl border border-stone-200 bg-white p-5 shadow-sm sm:gap-9 sm:p-8 lg:p-12">
+        <!-- Header -->
+        <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:gap-8">
+          <div class="flex max-w-xl flex-col gap-3">
+            <span
+              class="self-start rounded-full border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-amber-800">
+              Chỉ 3 bước
+            </span>
+            <h2 class="text-3xl font-bold leading-tight tracking-tight text-stone-900 lg:text-4xl">
+              Hướng dẫn treo tranh
+            </h2>
+            <p class="text-[15px] leading-relaxed text-stone-600 sm:text-base">
+              Tranh được đóng gói sẵn phụ kiện, bạn có thể tự treo tại nhà chỉ với một chiếc búa nhỏ.
+            </p>
+          </div>
+
+          <!-- Dụng cụ cần chuẩn bị -->
+          <div class="flex flex-col gap-2.5 lg:items-end">
+            <span class="text-xs font-semibold uppercase tracking-wider text-stone-500">
+              Dụng cụ cần chuẩn bị
+            </span>
+            <ul class="flex flex-wrap gap-2 lg:justify-end">
+              @for (tool of tools; track tool) {
+              <li class="rounded-full bg-stone-100 px-3.5 py-2 text-[13px] font-medium text-stone-700">
+                {{ tool }}
+              </li>
+              }
+            </ul>
+          </div>
         </div>
 
-        <ol class="install-steps">
-          <li>
-            <span class="step-label">Bước 1</span>
-            <span class="step-text">Chuẩn bị dụng cụ lắp đặt.</span>
-          </li>
-          <li>
-            <span class="step-label">Bước 2</span>
-            <span class="step-text">Xác định vị trí treo tranh phù hợp với không gian.</span>
-          </li>
-          <li>
-            <span class="step-label">Bước 3</span>
-            <span class="step-text">Cố định móc treo và lắp tranh lên tường.</span>
-          </li>
-          <li>
-            <span class="step-label">Bước 4</span>
-            <span class="step-text">Kiểm tra độ chắc chắn và điều chỉnh lại vị trí tranh.</span>
-          </li>
-        </ol>
-      </div>
+        <!-- Steps -->
+        <ol class="grid gap-4 md:grid-cols-3 md:gap-6">
+          @for (step of steps; track step.title; let i = $index) {
+          <li class="flex flex-col gap-4 rounded-[20px] border border-stone-200 bg-stone-50 p-4 md:gap-5 md:p-5">
+            <!-- Minh họa -->
+            <div
+              class="relative flex h-[168px] items-center justify-center rounded-xl bg-[#F3EDE3] md:h-44 md:rounded-[14px]">
+              <span
+                class="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-amber-700 text-base font-bold text-white md:left-3.5 md:top-3.5">
+                {{ i + 1 }}
+              </span>
 
-      <div
-        *ngIf="imageLightboxOpen()"
-        class="image-lightbox"
-        role="dialog"
-        aria-modal="true"
-        [attr.aria-label]="'Ảnh: ' + p.title"
-        (click)="closeImageLightbox()"
-      >
-        <button
-          type="button"
-          class="image-lightbox__close"
-          (click)="closeImageLightbox(); $event.stopPropagation()"
-          aria-label="Đóng"
-        >
+              @switch (step.illustration) {
+              @case ('place') {
+              <svg width="280" height="160" viewBox="0 0 280 160" fill="none" aria-hidden="true">
+                <line x1="140" y1="52" x2="140" y2="22" stroke="#B45309" stroke-width="4" stroke-linecap="round"></line>
+                <polyline points="128,34 140,20 152,34" stroke="#B45309" stroke-width="4" stroke-linecap="round"
+                  stroke-linejoin="round"></polyline>
+                <rect x="116" y="62" width="48" height="56" rx="10" fill="#FFFFFF" stroke="#44403C" stroke-width="3">
+                </rect>
+                <circle cx="128" cy="100" r="3.5" fill="#B45309"></circle>
+                <circle cx="140" cy="100" r="3.5" fill="#B45309"></circle>
+                <circle cx="152" cy="100" r="3.5" fill="#B45309"></circle>
+                <line x1="132" y1="78" x2="148" y2="78" stroke="#A8A29E" stroke-width="3" stroke-linecap="round"></line>
+              </svg>
+              }
+              @case ('hammer') {
+              <svg width="280" height="160" viewBox="0 0 280 160" fill="none" aria-hidden="true">
+                <rect x="118" y="108" width="44" height="40" rx="9" fill="#FFFFFF" stroke="#44403C" stroke-width="3">
+                </rect>
+                <circle cx="130" cy="134" r="3.5" fill="#B45309"></circle>
+                <circle cx="140" cy="134" r="3.5" fill="#B45309"></circle>
+                <circle cx="150" cy="134" r="3.5" fill="#B45309"></circle>
+                <g transform="rotate(20 140 82)">
+                  <rect x="134" y="14" width="12" height="48" rx="6" fill="#B45309"></rect>
+                  <rect x="106" y="62" width="68" height="26" rx="6" fill="#44403C"></rect>
+                </g>
+                <path d="M176 104 L190 98" stroke="#B45309" stroke-width="3.5" stroke-linecap="round"></path>
+                <path d="M178 116 L194 114" stroke="#B45309" stroke-width="3.5" stroke-linecap="round"></path>
+                <path d="M104 104 L90 98" stroke="#B45309" stroke-width="3.5" stroke-linecap="round"></path>
+              </svg>
+              }
+              @case ('hang') {
+              <svg width="280" height="160" viewBox="0 0 280 160" fill="none" aria-hidden="true">
+                <circle cx="140" cy="30" r="7" fill="#44403C"></circle>
+                <path d="M140 30 L96 76 M140 30 L184 76" stroke="#A8A29E" stroke-width="2.5" stroke-linecap="round">
+                </path>
+                <rect x="82" y="64" width="116" height="84" rx="6" fill="#FFFFFF" stroke="#B45309" stroke-width="5">
+                </rect>
+                <rect x="94" y="76" width="92" height="60" rx="2" fill="#E7E5E4"></rect>
+                <circle cx="160" cy="92" r="8" fill="#F59E0B"></circle>
+                <path d="M94 136 L120 106 L138 124 L152 112 L186 136 Z" fill="#78716C"></path>
+                <circle cx="226" cy="46" r="16" fill="#059669"></circle>
+                <polyline points="218,46 224,52 234,40" stroke="#FFFFFF" stroke-width="3.5" stroke-linecap="round"
+                  stroke-linejoin="round"></polyline>
+              </svg>
+              }
+              }
+            </div>
+
+            <!-- Nội dung -->
+            <div class="flex flex-col gap-2">
+              <h3 class="text-lg font-semibold text-stone-900">{{ step.title }}</h3>
+              <p class="text-[15px] leading-relaxed text-stone-600">{{ step.desc }}</p>
+
+              @if (step.note) {
+              <p
+                class="mt-1 flex items-center gap-2 self-start rounded-[10px] bg-amber-100 px-3 py-2 text-[13px] font-medium text-amber-800">
+                <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="9"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12.5"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <span>{{ step.note }}</span>
+              </p>
+              }
+            </div>
+          </li>
+          }
+        </ol>
+
+        <!-- Hoàn tất -->
+        <div
+          class="flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-800 sm:items-center sm:gap-3.5 sm:rounded-[18px] sm:px-5 sm:py-4">
+          <svg class="h-6 w-6 shrink-0 sm:h-[26px] sm:w-[26px]" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="9"></circle>
+            <polyline points="8.5,12.5 11,15 15.5,9.5"></polyline>
+          </svg>
+          <p class="text-sm leading-relaxed sm:text-[15px] mb-0 mt-0">
+            <strong class="font-semibold">Xong rồi!</strong>
+            Cần hỗ trợ lắp đặt hoặc tranh bị lỗi khi vận chuyển? Liên hệ shop để được
+            <strong class="font-semibold">đổi trả 1 đổi 1 trong 7 ngày</strong>.
+          </p>
+        </div>
+      </section>
+
+      <!-- End guild -->
+
+      <div *ngIf="imageLightboxOpen()" class="image-lightbox" role="dialog" aria-modal="true"
+        [attr.aria-label]="'Ảnh: ' + p.title" (click)="closeImageLightbox()">
+        <button type="button" class="image-lightbox__close" (click)="closeImageLightbox(); $event.stopPropagation()"
+          aria-label="Đóng">
           ×
         </button>
-        <img
-          [src]="imageUrlOrPlaceholder()"
-          [alt]="p.title"
-          class="image-lightbox__img"
-          (click)="$event.stopPropagation()"
-        />
+        <img [src]="imageUrlOrPlaceholder()" [alt]="p.title" class="image-lightbox__img"
+          (click)="$event.stopPropagation()" />
       </div>
     </ng-container>
   </div>

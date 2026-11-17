@@ -6,6 +6,13 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Product } from '../../core/models/product.model';
 import { ProductService } from '../../core/services/product.service';
 
+interface InstallStep {
+  title: string;
+  desc: string;
+  note?: string;
+  illustration: 'place' | 'hammer' | 'hang';
+}
+
 @Component({
   standalone: true,
   selector: 'app-product-detail',
@@ -19,6 +26,27 @@ export class ProductDetailComponent {
   private readonly document = inject(DOCUMENT);
 
   readonly placeholderImage = 'assets/images/placeholder-product.jpg';
+  readonly tools: string[] = ['Búa nhỏ', 'Ghim treo tranh (đinh 3 chấu)', 'Móc treo tranh'];
+
+  readonly steps: InstallStep[] = [
+    {
+      title: 'Đặt ghim vào vị trí',
+      desc: 'Giữ ghim áp sát vào vị trí cần đóng trên tường.',
+      note: 'Hướng phần mũi tên lên trên.',
+      illustration: 'place',
+    },
+    {
+      title: 'Dùng búa đóng ghim',
+      desc: 'Dùng búa gõ nhẹ vào 3 đầu đinh, gõ từ từ cho đến khi đinh vào hết.',
+      note: 'Gõ nhẹ tay để không làm hỏng tường.',
+      illustration: 'hammer',
+    },
+    {
+      title: 'Treo tranh lên',
+      desc: 'Treo móc tranh vào ghim là hoàn tất.',
+      illustration: 'hang',
+    },
+  ];
 
   product = signal<Product | null>(null);
   loading = signal(true);
